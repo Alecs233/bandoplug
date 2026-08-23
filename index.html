@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BandoPlug | Comunitate & Forum Oficial FiveM Roleplay</title>
+  <meta name="description" content="Comunitatea oficială BandoPlug - Server de FiveM Roleplay Românesc, Gang-uri, Departamente, Regulament și Forum de Discuții.">
+  <link rel="icon" type="image/png" href="assets/bandoplug.png">
+
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="top-bar">
+    <div class="container top-bar-content">
+      <div class="top-bar-left">
+        <span class="live-pulse"><i class="fa-solid fa-circle"></i></span>
+        <span class="top-text"><strong>BandoPlug v2.0 Live!</strong> Alătură-te acum pe serverul nostru de FiveM Roleplay.</span>
+      </div>
+      <div class="top-bar-right">
+        <button id="copyIpBtn" class="top-btn" title="Copiază adresa IP FiveM">
+          <i class="fa-solid fa-server"></i> <span id="ipText">connect play.bandoplug.ro</span>
+        </button>
+        <a href="https://discord.gg/8cR9EA48US" target="_blank" class="top-btn discord-top">
+          <i class="fa-brands fa-discord"></i> Discord Oficial
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navigation -->
+  <header class="navbar-wrapper">
+    <div class="container navbar">
+      <a href="#" class="brand-logo" onclick="switchView('home')">
+        <img src="assets/bandoplug.png" alt="BandoPlug Logo" class="nav-logo-img">
+        <div class="brand-text">
+          <span class="brand-title">BANDO<span>PLUG</span></span>
+          <span class="brand-subtitle">COMMUNITY & FORUM</span>
+        </div>
+      </a>
+
+      <nav class="nav-menu" id="navMenu">
+        <a href="#home" class="nav-link active" onclick="switchView('home')"><i class="fa-solid fa-house"></i> Acasă</a>
+        <a href="#forum" class="nav-link" onclick="switchView('forum')"><i class="fa-solid fa-comments"></i> Forum</a>
+        <a href="#regulament" class="nav-link" onclick="switchView('regulament')"><i class="fa-solid fa-book-skull"></i> Regulament</a>
+        <a href="#aplicatii" class="nav-link" onclick="switchView('aplicatii')"><i class="fa-solid fa-file-pen"></i> Aplicații</a>
+        <a href="#status" class="nav-link" onclick="switchView('status')"><i class="fa-solid fa-chart-line"></i> Status</a>
+        <a href="https://discord.gg/8cR9EA48US" target="_blank" class="nav-link discord-link"><i class="fa-brands fa-discord"></i> Discord</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-red-glow" onclick="openNewPostModal()">
+          <i class="fa-solid fa-plus"></i> Creează Topic
+        </button>
+        <button class="btn btn-discord" onclick="openLoginModal()">
+          <i class="fa-brands fa-discord"></i> <span id="userBtnLabel">Conectare</span>
+        </button>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Deschide meniul">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero-section" id="heroSection">
+    <div class="hero-bg-overlay"></div>
+    <div class="hero-glow-blob"></div>
+    <div class="container hero-container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <i class="fa-solid fa-fire text-red"></i> COMUNITATE EXCLUSIVISTĂ FIVEM ROLEPLAY
+        </div>
+        <h1 class="hero-heading">BANDO<span>PLUG</span> ROMÂNIA</h1>
+        <p class="hero-desc">
+          Bun venit pe portalul oficial al comunității <strong>BandoPlug</strong>. Experimentează cel mai avansat sistem de Roleplay urban, gang-uri personalizate, economie dinamică, evenimente zilnice și o comunitate unită.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="fivem://connect/play.bandoplug.ro" class="btn btn-hero-primary">
+            <i class="fa-solid fa-play"></i> Conectează-te pe Server
+          </a>
+          <a href="https://discord.gg/8cR9EA48US" target="_blank" class="btn btn-hero-discord">
+            <i class="fa-brands fa-discord"></i> Alătură-te pe Discord
+          </a>
+          <button class="btn btn-hero-outline" onclick="switchView('regulament')">
+            <i class="fa-solid fa-shield-halved"></i> Citește Regulamentul
+          </button>
+        </div>
+
+        <!-- Quick Stats Cards -->
+        <div class="hero-stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-info">
+              <h3 id="statPlayers">184 / 250</h3>
+              <p>Jucători Conectați</p>
+            </div>
+            <span class="status-indicator online"></span>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-brands fa-discord"></i></div>
+            <div class="stat-info">
+              <h3 id="statDiscord">3,420+</h3>
+              <p>Membri Discord</p>
+            </div>
+            <span class="status-indicator online"></span>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-comments"></i></div>
+            <div class="stat-info">
+              <h3 id="statTopics">1,280</h3>
+              <p>Discuții pe Forum</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-gauge-high"></i></div>
+            <div class="stat-info">
+              <h3>128 Hz</h3>
+              <p>Tickrate & 0 Lag</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="logo-showcase-card">
+          <div class="logo-glow-ring"></div>
+          <img src="assets/bandoplug.png" alt="BandoPlug Official" class="hero-logo-img">
+          <div class="logo-tag">BANDO PLUG RP</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN APP CONTAINER (Views) -->
+  <main class="container main-content-wrapper">
+
+    <!-- VIEW 1: HOME & FORUMS -->
+    <div id="view-forum" class="app-view active-view">
+      
+      <!-- Forum Header Bar & Filter -->
+      <div class="forum-control-bar">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="forumSearch" placeholder="Caută topicuri, reguli, anunțuri, ghiduri..." oninput="filterTopics()">
+        </div>
+        <div class="category-pills" id="categoryPills">
+          <button class="pill active" onclick="selectCategory('all', this)"><i class="fa-solid fa-layer-group"></i> Toate</button>
+          <button class="pill" onclick="selectCategory('anunturi', this)"><i class="fa-solid fa-bullhorn"></i> Anunțuri</button>
+          <button class="pill" onclick="selectCategory('generale', this)"><i class="fa-solid fa-comments"></i> Generale</button>
+          <button class="pill" onclick="selectCategory('ganguri', this)"><i class="fa-solid fa-skull"></i> Gang-uri</button>
+          <button class="pill" onclick="selectCategory('departamente', this)"><i class="fa-solid fa-shield-halved"></i> Departamente</button>
+          <button class="pill" onclick="selectCategory('rapoarte', this)"><i class="fa-solid fa-triangle-exclamation"></i> Reclamații</button>
+          <button class="pill" onclick="selectCategory('sugestii', this)"><i class="fa-solid fa-lightbulb"></i> Sugestii</button>
+        </div>
+      </div>
+
+      <!-- Main Layout: Forum Categories & Sidebar -->
+      <div class="layout-grid">
+        
+        <!-- Left: Forum Categories & Topics List -->
+        <div class="content-column">
+          
+          <!-- Category Group 1: Oficial & Anunțuri -->
+          <div class="forum-section-card" data-category-group="anunturi">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fa-solid fa-bullhorn text-red"></i>
+                <h2>Anunțuri & Informații Oficiale</h2>
+              </div>
+              <span class="badge-count">Oficial</span>
+            </div>
+
+            <div class="topics-list" id="list-anunturi">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Category Group 2: Comunitate & Discuții Libere -->
+          <div class="forum-section-card" data-category-group="generale">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fa-solid fa-comments text-red"></i>
+                <h2>Comunitate & Discuții Generale</h2>
+              </div>
+              <span class="badge-count">Social</span>
+            </div>
+
+            <div class="topics-list" id="list-generale"></div>
+          </div>
+
+          <!-- Category Group 3: Gang-uri & Ilegale -->
+          <div class="forum-section-card" data-category-group="ganguri">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fa-solid fa-skull-crossbones text-red"></i>
+                <h2>Facțiuni Ilegale & Carteluri</h2>
+              </div>
+              <span class="badge-count">Ilegal RP</span>
+            </div>
+
+            <div class="topics-list" id="list-ganguri"></div>
+          </div>
+
+          <!-- Category Group 4: Departamente Legale -->
+          <div class="forum-section-card" data-category-group="departamente">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fa-solid fa-building-shield text-red"></i>
+                <h2>Departamente Legale & Instituții (LSPD / EMS)</h2>
+              </div>
+              <span class="badge-count">Legal RP</span>
+            </div>
+
+            <div class="topics-list" id="list-departamente"></div>
+          </div>
+
+          <!-- Category Group 5: Reclamații, Debanări & Suport -->
+          <div class="forum-section-card" data-category-group="rapoarte">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fa-solid fa-scale-balanced text-red"></i>
+                <h2>Suport, Reclamații & Cereri Debanare</h2>
+              </div>
+              <span class="badge-count">Asistență</span>
+            </div>
+
+            <div class="topics-list" id="list-rapoarte"></div>
+          </div>
+
+          <!-- Category Group 6: Sugestii & Propuneri -->
+          <div class="forum-section-card" data-category-group="sugestii">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fa-solid fa-lightbulb text-red"></i>
+                <h2>Sugestii & Idei de Dezvoltare</h2>
+              </div>
+              <span class="badge-count">Comunitate</span>
+            </div>
+
+            <div class="topics-list" id="list-sugestii"></div>
+          </div>
+
+        </div>
+
+        <!-- Right: Modern Sidebar Widgets -->
+        <aside class="sidebar-column">
+          
+          <!-- Discord Widget Card -->
+          <div class="widget-card discord-widget">
+            <div class="widget-header">
+              <div class="widget-title"><i class="fa-brands fa-discord text-blurple"></i> Server Discord</div>
+              <span class="live-dot">LIVE</span>
+            </div>
+            <div class="discord-widget-body">
+              <div class="discord-brand-box">
+                <img src="assets/bandoplug.png" alt="BandoPlug Server" class="discord-avatar">
+                <div class="discord-meta">
+                  <h4>BandoPlug RP România</h4>
+                  <p><span class="online-dot"></span> <strong>1,240 Online</strong> &bull; 3,420 Membri</p>
+                </div>
+              </div>
+              <p class="widget-text">Vino pe canalul nostru oficial de Discord pentru anunțuri instantanee, tichete de suport, voice channels și giveaways!</p>
+              <a href="https://discord.gg/8cR9EA48US" target="_blank" class="btn btn-discord-block">
+                <i class="fa-brands fa-discord"></i> Intră pe Discord Acum
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Actions Widget -->
+          <div class="widget-card">
+            <div class="widget-header">
+              <div class="widget-title"><i class="fa-solid fa-bolt text-red"></i> Link-uri Rapide</div>
+            </div>
+            <div class="quick-links-list">
+              <a href="#aplicatii" onclick="switchView('aplicatii')" class="quick-link-item">
+                <i class="fa-solid fa-id-card"></i>
+                <div>
+                  <strong>Aplică în Echipa Staff</strong>
+                  <small>Recrutările sunt deschise</small>
+                </div>
+              </a>
+              <a href="#regulament" onclick="switchView('regulament')" class="quick-link-item">
+                <i class="fa-solid fa-gavel"></i>
+                <div>
+                  <strong>Regulament Roleplay</strong>
+                  <small>Evită sancțiunile pe server</small>
+                </div>
+              </a>
+              <a href="https://discord.gg/8cR9EA48US" target="_blank" class="quick-link-item">
+                <i class="fa-solid fa-headset"></i>
+                <div>
+                  <strong>Deschide Tichet Suport</strong>
+                  <small>Asistență 24/7 pe Discord</small>
+                </div>
+              </a>
+              <a href="https://discord.gg/8cR9EA48US" target="_blank" class="quick-link-item">
+                <i class="fa-solid fa-gem"></i>
+                <div>
+                  <strong>Magazin VIP & Vehicule</strong>
+                  <small>Susține comunitatea BandoPlug</small>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Staff Online / Conducere -->
+          <div class="widget-card">
+            <div class="widget-header">
+              <div class="widget-title"><i class="fa-solid fa-crown text-gold"></i> Conducere & Staff</div>
+            </div>
+            <div class="staff-list">
+              <div class="staff-item">
+                <div class="staff-avatar-wrapper">
+                  <div class="staff-avatar" style="background: linear-gradient(135deg, #ff1e38, #500);">SK</div>
+                  <span class="user-status online"></span>
+                </div>
+                <div class="staff-details">
+                  <span class="staff-name">Seek <small class="text-muted">(@seekmao)</small></span>
+                  <span class="role-badge badge-owner">FOUNDER & OWNER</span>
+                </div>
+              </div>
+
+              <div class="staff-item">
+                <div class="staff-avatar-wrapper">
+                  <div class="staff-avatar" style="background: linear-gradient(135deg, #ff1e38, #500);">GH</div>
+                  <span class="user-status online"></span>
+                </div>
+                <div class="staff-details">
+                  <span class="staff-name">Ghost</span>
+                  <span class="role-badge badge-owner">OWNER & FOUNDER</span>
+                </div>
+              </div>
+
+              <div class="staff-item">
+                <div class="staff-avatar-wrapper">
+                  <div class="staff-avatar">KX</div>
+                  <span class="user-status online"></span>
+                </div>
+                <div class="staff-details">
+                  <span class="staff-name">Kroxx</span>
+                  <span class="role-badge badge-dev">HEAD DEVELOPER</span>
+                </div>
+              </div>
+
+              <div class="staff-item">
+                <div class="staff-avatar-wrapper">
+                  <div class="staff-avatar">AL</div>
+                  <span class="user-status away"></span>
+                </div>
+                <div class="staff-details">
+                  <span class="staff-name">Alex_Plug</span>
+                  <span class="role-badge badge-admin">HEAD ADMIN</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Forum Statistics -->
+          <div class="widget-card">
+            <div class="widget-header">
+              <div class="widget-title"><i class="fa-solid fa-chart-pie text-red"></i> Statistici Forum</div>
+            </div>
+            <div class="stats-mini-list">
+              <div class="stats-mini-row">
+                <span>Total Discuții:</span>
+                <strong id="sidebarTotalTopics">48</strong>
+              </div>
+              <div class="stats-mini-row">
+                <span>Total Răspunsuri:</span>
+                <strong>429</strong>
+              </div>
+              <div class="stats-mini-row">
+                <span>Utilizatori Înregistrați:</span>
+                <strong>2,190</strong>
+              </div>
+              <div class="stats-mini-row">
+                <span>Cel mai nou membru:</span>
+                <span class="text-red font-weight-bold">BandoKidd_99</span>
+              </div>
+            </div>
+          </div>
+
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- VIEW 2: REGULAMENT GENERAL -->
+    <div id="view-regulament" class="app-view">
+      <div class="page-header-card">
+        <div class="page-header-title">
+          <i class="fa-solid fa-book-skull text-red"></i>
+          <div>
+            <h1>Regulament Oficial BandoPlug Roleplay</h1>
+            <p>Respectarea acestui regulament este obligatorie pentru toți jucătorii comunității.</p>
+          </div>
+        </div>
+        <a href="https://discord.gg/8cR9EA48US" target="_blank" class="btn btn-discord">
+          <i class="fa-brands fa-discord"></i> Suport Regulament
+        </a>
+      </div>
+
+      <div class="rules-container">
+        
+        <!-- Regula 1: Termeni de Bază -->
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <span class="rule-number">01</span>
+            <h3>Terminologie & Concepte Roleplay (RP)</h3>
+          </div>
+          <div class="rule-body">
+            <ul>
+              <li><strong>In Character (IC):</strong> Tot ce ține de universul jocului și acțiunile personajului tău.</li>
+              <li><strong>Out of Character (OOC):</strong> Tot ce ține de tine ca persoană din viața reală. Nu amestecați informațiile OOC cu cele IC.</li>
+              <li><strong>Fail RP:</strong> Efectuarea unor acțiuni nerealiste sau neconforme cu un caracter uman într-o societate reală. (Sancțiune: Warn / Ban temporar).</li>
+              <li><strong>Fear RP:</strong> Sunteți obligat să vă prețuiți viața personajului când sunteți amenințat cu o armă sau vă aflați în inferioritate numerică netă.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Regula 2: Combat & Sancțiuni Grave -->
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <span class="rule-number">02</span>
+            <h3>Reguli de Luptă (RDM / VDM / NLR)</h3>
+          </div>
+          <div class="rule-body">
+            <ul>
+              <li><strong>RDM (Random Deathmatch):</strong> Uciderea sau atacarea unui alt jucător fără un motiv bine întemeiat de Roleplay este strict INTERZISĂ.</li>
+              <li><strong>VDM (Vehicle Deathmatch):</strong> Folosirea unui vehicul drept armă pentru a călca intenționat alți jucători este strict interzisă.</li>
+              <li><strong>NLR (New Life Rule):</strong> Dacă caracterul tău moare și primește respawn la spital, uiți complet acțiunea anterioară și nu ai voie să te reîntorci la locație timp de 30 de minute.</li>
+              <li><strong>MetaGaming (MG):</strong> Folosirea informațiilor aflate pe Discord, Twitch sau forum în joc pentru un avantaj IC.</li>
+              <li><strong>PowerGaming (PG):</strong> Forțarea unui alt jucător într-o acțiune fără a-i da șansa de a reacționa, sau realizarea unor acțiuni supraomenești.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Regula 3: Ilegale & Gang-uri -->
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <span class="rule-number">03</span>
+            <h3>Regulament Gang-uri, Carteluri & Jafuri</h3>
+          </div>
+          <div class="rule-body">
+            <ul>
+              <li>Orice gang oficial BandoPlug trebuie să aibă minim 5 membri activi și o aplicație aprobată pe forum.</li>
+              <li>Jafurile la bănci mari și magazine necesită negociator din partea Poliției și respectarea numărului maxim de ostatici.</li>
+              <li>Turf Wars (războaiele de teritoriu) se desfășoară exclusiv în zonele desemnate pe hartă conform orarului din Discord.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Regula 4: Comportament Comunitar -->
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <span class="rule-number">04</span>
+            <h3>Conduită Comunitară & Respect</h3>
+          </div>
+          <div class="rule-body">
+            <ul>
+              <li>Rasismul, discriminarea de orice fel, doxxing-ul, limbajul vulgar extrem OOC sau promovarea altor servere duc la <strong>BAN PERMANENT</strong> fără drept de apel.</li>
+              <li>Folosirea oricărui tip de hack, mod meniu, crosshair extern, exploit sau abuz de bug se sancționează cu <strong>BAN PERMANENT</strong> + Blacklist.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VIEW 3: APLICAȚII STAFF & FACȚIUNI -->
+    <div id="view-aplicatii" class="app-view">
+      <div class="page-header-card">
+        <div class="page-header-title">
+          <i class="fa-solid fa-file-pen text-red"></i>
+          <div>
+            <h1>Formulare de Recrutare BandoPlug</h1>
+            <p>Alege departamentul sau poziția dorită și trimite cererea direct pe forum.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="apply-cards-grid">
+        <div class="apply-card">
+          <div class="apply-card-icon"><i class="fa-solid fa-user-shield text-red"></i></div>
+          <h3>Aplicație Echipa Staff</h3>
+          <p>Devino Helper / Moderator pe serverul BandoPlug și ajută la menținerea unui Roleplay de calitate.</p>
+          <ul class="apply-reqs">
+            <li><i class="fa-solid fa-check text-red"></i> Minim 16 ani împliniți</li>
+            <li><i class="fa-solid fa-check text-red"></i> Cunoașterea perfectă a regulamentului</li>
+            <li><i class="fa-solid fa-check text-red"></i> Microfon clar & disponibilitate pe Discord</li>
+          </ul>
+          <button class="btn btn-red-glow btn-block" onclick="openApplyForm('Staff / Helper')">Aplică la Staff</button>
+        </div>
+
+        <div class="apply-card">
+          <div class="apply-card-icon"><i class="fa-solid fa-building-shield text-blue"></i></div>
+          <h3>Aplicație LSPD (Poliție)</h3>
+          <p>Alătură-te departamentului de poliție din Los Santos. Patrulează străzile și menține ordinea publică.</p>
+          <ul class="apply-reqs">
+            <li><i class="fa-solid fa-check text-blue"></i> Minim 15 ani</li>
+            <li><i class="fa-solid fa-check text-blue"></i> Fără antecedente penale recente IC</li>
+            <li><i class="fa-solid fa-check text-blue"></i> Abilități bune de conducere & comunicare radio</li>
+          </ul>
+          <button class="btn btn-blue btn-block" onclick="openApplyForm('LSPD - Poliție')">Aplică la LSPD</button>
+        </div>
+
+        <div class="apply-card">
+          <div class="apply-card-icon"><i class="fa-solid fa-truck-medical text-green"></i></div>
+          <h3>Aplicație EMS (Medici & Salvare)</h3>
+          <p>Salvează viețile cetățenilor răniți și asigură primul ajutor în situații de urgență maximă.</p>
+          <ul class="apply-reqs">
+            <li><i class="fa-solid fa-check text-green"></i> Minim 14 ani</li>
+            <li><i class="fa-solid fa-check text-green"></i> Comportament exemplar și răbdare</li>
+            <li><i class="fa-solid fa-check text-green"></i> Seriozitate în apelurile de urgență</li>
+          </ul>
+          <button class="btn btn-green btn-block" onclick="openApplyForm('EMS - Medici')">Aplică la EMS</button>
+        </div>
+
+        <div class="apply-card">
+          <div class="apply-card-icon"><i class="fa-solid fa-skull-crossbones text-red"></i></div>
+          <h3>Înregistrare Gang / Mafie Oficială</h3>
+          <p>Ai o grupare organizată? Aplică pentru a primi statut de Gang Oficial, teritoriu și arme.</p>
+          <ul class="apply-reqs">
+            <li><i class="fa-solid fa-check text-red"></i> Minim 5 membri activi</li>
+            <li><i class="fa-solid fa-check text-red"></i> Lore și poveste bine structurată</li>
+            <li><i class="fa-solid fa-check text-red"></i> Lider matur cu experiență de Roleplay</li>
+          </ul>
+          <button class="btn btn-red-glow btn-block" onclick="openApplyForm('Gang Oficial')">Înregistrează Gang</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: SERVER STATUS & LIVE INFO -->
+    <div id="view-status" class="app-view">
+      <div class="page-header-card">
+        <div class="page-header-title">
+          <i class="fa-solid fa-server text-red"></i>
+          <div>
+            <h1>Stare Servere & Infrastructură</h1>
+            <p>Monitorizare în timp real pentru serverul FiveM, Baza de Date și Serviciile BandoPlug.</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="refreshServerStats()">
+          <i class="fa-solid fa-rotate-right"></i> Actualizează
+        </button>
+      </div>
+
+      <div class="status-cards-grid">
+        <div class="status-box online-box">
+          <div class="status-box-header">
+            <h4>FiveM Roleplay Server #1</h4>
+            <span class="status-pill online">ONLINE</span>
+          </div>
+          <div class="status-box-metrics">
+            <div><small>Jucători:</small> <strong>184 / 250</strong></div>
+            <div><small>IP Server:</small> <code>play.bandoplug.ro:30120</code></div>
+            <div><small>Ping Mediu:</small> <strong>14 ms</strong></div>
+            <div><small>Uptime:</small> <strong>99.9% (7d 14h)</strong></div>
+          </div>
+        </div>
+
+        <div class="status-box online-box">
+          <div class="status-box-header">
+            <h4>Discord Bot & Voice Gateway</h4>
+            <span class="status-pill online">ONLINE</span>
+          </div>
+          <div class="status-box-metrics">
+            <div><small>Stare Bot:</small> <strong>Operațional</strong></div>
+            <div><small>Tichete Active:</small> <strong>8</strong></div>
+            <div><small>Sistem Loguri:</small> <strong>Conectat</strong></div>
+          </div>
+        </div>
+
+        <div class="status-box online-box">
+          <div class="status-box-header">
+            <h4>Baza de Date & Sync In-Game</h4>
+            <span class="status-pill online">ONLINE</span>
+          </div>
+          <div class="status-box-metrics">
+            <div><small>MySQL Cluster:</small> <strong>1.2ms latență</strong></div>
+            <div><small>Salvare Automată:</small> <strong>La fiecare 30 secunde</strong></div>
+            <div><small>Anti-DDoS:</small> <strong>Activ (Layer 7 Filter)</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: Creează Topic Nou -->
+  <div class="modal-overlay" id="newPostModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-pen-to-square text-red"></i> Creează Topic Nou pe Forum</h3>
+        <button class="modal-close" onclick="closeModal('newPostModal')">&times;</button>
+      </div>
+      <form id="newTopicForm" onsubmit="handleCreateTopic(event)">
+        <div class="form-group">
+          <label for="topicTitle">Titlul Topicului *</label>
+          <input type="text" id="topicTitle" required placeholder="ex: [PRODUCȚIE] Nou Ghid pentru Începători în Los Santos">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="topicCategory">Categorie *</label>
+            <select id="topicCategory" required>
+              <option value="anunturi">Anunțuri & Oficial</option>
+              <option value="generale" selected>Comunitate & Discuții Generale</option>
+              <option value="ganguri">Facțiuni Ilegale & Gang-uri</option>
+              <option value="departamente">Departamente Legale (LSPD / EMS)</option>
+              <option value="rapoarte">Reclamații & Suport</option>
+              <option value="sugestii">Sugestii & Propuneri</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="authorName">Numele Tău (sau cont Discord) *</label>
+            <input type="text" id="authorName" required placeholder="ex: PlugMaster_RO">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="topicContent">Conținut Topic *</label>
+          <textarea id="topicContent" rows="6" required placeholder="Scrie detaliile topicului tău aici..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('newPostModal')">Anulează</button>
+          <button type="submit" class="btn btn-red-glow"><i class="fa-solid fa-paper-plane"></i> Publică Topicul</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Detalii / Vizualizare Topic & Răspunsuri -->
+  <div class="modal-overlay" id="topicDetailModal">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <div id="topicDetailHeader">
+          <span class="badge-category" id="modalCategoryBadge">Categorie</span>
+          <h2 id="modalTopicTitle" style="margin-top: 5px;">Titlu Topic</h2>
+        </div>
+        <button class="modal-close" onclick="closeModal('topicDetailModal')">&times;</button>
+      </div>
+
+      <div class="topic-detail-body">
+        <div class="original-post-box">
+          <div class="post-user-info">
+            <div class="user-avatar-placeholder" id="modalAuthorAvatar">BP</div>
+            <div>
+              <strong id="modalAuthorName">Autor</strong>
+              <div class="text-muted" id="modalPostDate">Data publicării</div>
+            </div>
+          </div>
+          <div class="post-content-text" id="modalPostContent">
+            Conținutul topicului...
+          </div>
+        </div>
+
+        <!-- Replies Section -->
+        <div class="replies-section">
+          <h3><i class="fa-solid fa-reply text-red"></i> Răspunsuri (<span id="replyCount">0</span>)</h3>
+          <div class="replies-list" id="modalRepliesList">
+            <!-- Rendered dynamic replies -->
+          </div>
+
+          <!-- Add reply form -->
+          <form class="add-reply-form" id="replyForm" onsubmit="handleAddReply(event)">
+            <div class="form-row">
+              <input type="text" id="replyAuthor" required placeholder="Numele tău..." class="reply-input-name">
+              <input type="text" id="replyContent" required placeholder="Scrie un răspuns la acest topic..." class="reply-input-text">
+              <button type="submit" class="btn btn-red-glow"><i class="fa-solid fa-paper-plane"></i> Răspunde</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Formular Aplicație Rapidă -->
+  <div class="modal-overlay" id="applyModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-file-signature text-red"></i> <span id="applyModalTitle">Formular Aplicație</span></h3>
+        <button class="modal-close" onclick="closeModal('applyModal')">&times;</button>
+      </div>
+      <form id="submitApplicationForm" onsubmit="handleApplicationSubmit(event)">
+        <input type="hidden" id="applyType" value="">
+        
+        <div class="form-group">
+          <label>Nume Real & Vârstă *</label>
+          <input type="text" id="applicantRealName" required placeholder="ex: Andrei, 18 ani">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nume Discord (Tag) *</label>
+            <input type="text" id="applicantDiscord" required placeholder="ex: andrei#0000 sau @andrei">
+          </div>
+          <div class="form-group">
+            <label>Nume În Joc (Roleplay) *</label>
+            <input type="text" id="applicantRPName" required placeholder="ex: Marcus Vance">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>De ce vrei să te alături și ce experiență ai? *</label>
+          <textarea id="applicantReason" rows="4" required placeholder="Descrie experiența ta pe servere de FiveM RP și motivele pentru care ar trebui să fii acceptat..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('applyModal')">Închide</button>
+          <button type="submit" class="btn btn-red-glow"><i class="fa-solid fa-check"></i> Trimite Aplicația</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Conectare Discord -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-card modal-small text-center">
+      <div class="modal-header justify-center">
+        <img src="assets/bandoplug.png" alt="BandoPlug" style="width: 70px; margin: 0 auto 10px;">
+        <h3>Conectare la BandoPlug</h3>
+        <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+      </div>
+      <p class="text-muted" style="margin-bottom: 20px;">
+        Conectează-te cu contul tău de Discord pentru a sincroniza rolurile, badge-urile și postările de pe forum.
+      </p>
+      <a href="https://discord.gg/8cR9EA48US" target="_blank" class="btn btn-discord-block" style="padding: 12px; font-size: 1.05rem;" onclick="mockLoginSuccess()">
+        <i class="fa-brands fa-discord"></i> Conectează-te prin Discord
+      </a>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- FOOTER -->
+  <footer class="main-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="brand-logo footer-logo">
+          <img src="assets/bandoplug.png" alt="BandoPlug" class="nav-logo-img">
+          <div class="brand-text">
+            <span class="brand-title">BANDO<span>PLUG</span></span>
+            <span class="brand-subtitle">COMMUNITY & FORUM</span>
+          </div>
+        </div>
+        <p class="footer-desc">
+          BandoPlug este o comunitate dedicată pasionaților de FiveM Roleplay din România. Oferim o experiență de joc unică, sisteme customizate și o atmosferă prietenoasă.
+        </p>
+        <div class="footer-socials">
+          <a href="https://discord.gg/8cR9EA48US" target="_blank" class="social-icon" title="Discord"><i class="fa-brands fa-discord"></i></a>
+          <a href="#" class="social-icon" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="social-icon" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" class="social-icon" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-links-group">
+        <h4>Navigație Rapidă</h4>
+        <ul>
+          <li><a href="#home" onclick="switchView('home')">Acasă</a></li>
+          <li><a href="#forum" onclick="switchView('forum')">Forum & Categorii</a></li>
+          <li><a href="#regulament" onclick="switchView('regulament')">Regulament General</a></li>
+          <li><a href="#aplicatii" onclick="switchView('aplicatii')">Aplicații Staff & Gang</a></li>
+          <li><a href="#status" onclick="switchView('status')">Stare Servere</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-group">
+        <h4>Suport & Link-uri</h4>
+        <ul>
+          <li><a href="https://discord.gg/8cR9EA48US" target="_blank">Canal Discord Oficial</a></li>
+          <li><a href="https://discord.gg/8cR9EA48US" target="_blank">Tichete de Asistență</a></li>
+          <li><a href="https://discord.gg/8cR9EA48US" target="_blank">Magazin VIP / Donații</a></li>
+          <li><a href="#regulament" onclick="switchView('regulament')">Politica de Confidențialitate</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p>&copy; 2026 <strong>BandoPlug România</strong>. Toate drepturile rezervate. GTA V & FiveM sunt mărci înregistrate Take-Two Interactive & Rockstar Games.</p>
+        <p>Discord Oficial: <a href="https://discord.gg/8cR9EA48US" target="_blank" class="text-red">discord.gg/8cR9EA48US</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
