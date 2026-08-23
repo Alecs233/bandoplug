@@ -808,55 +808,59 @@
     </div>
   </div>
 
-  <!-- MODAL: Conectare Discord & Owner -->
+  <!-- MODAL: Autentificare & Înregistrare Securizată -->
   <div class="modal-overlay" id="loginModal">
     <div class="modal-card modal-small text-center">
       <div class="modal-header justify-center">
         <img src="bandoplug.png" onerror="this.onerror=null; this.src='assets/bandoplug.png';" alt="BandoPlug" style="width: 75px; margin: 0 auto 10px;">
-        <h3>Autentificare BandoPlug</h3>
+        <h3>Cont BandoPlug</h3>
         <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
       </div>
       
-      <!-- Login Tabs -->
+      <!-- Auth Switcher -->
       <div class="auth-tabs">
-        <button class="auth-tab-btn active" id="tabMemberBtn" onclick="switchAuthTab('member')"><i class="fa-brands fa-discord"></i> Membru</button>
-        <button class="auth-tab-btn" id="tabOwnerBtn" onclick="switchAuthTab('owner')"><i class="fa-solid fa-crown text-gold"></i> Conducere / Owner</button>
+        <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')"><i class="fa-solid fa-right-to-bracket"></i> Conectare</button>
+        <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')"><i class="fa-solid fa-user-plus"></i> Înregistrare</button>
       </div>
 
-      <!-- Member Tab -->
-      <div id="authMemberPane" class="auth-pane active">
-        <p class="text-muted" style="margin: 15px 0 20px; font-size: 13.5px;">
-          Conectează-te cu contul tău de Discord pentru a sincroniza profilul și a posta pe forum.
+      <!-- Tab 1: Conectare (Login) -->
+      <form id="authLoginPane" class="auth-pane active" onsubmit="handleAccountLogin(event)">
+        <p class="text-muted" style="margin: 12px 0 16px; font-size: 13px;">
+          Introdu numele tău de Discord și parola pentru a te autentifica pe forum.
         </p>
         <div class="form-group text-left" style="text-align: left;">
-          <label>Nume Utilizator / Discord</label>
-          <input type="text" id="memberLoginName" placeholder="ex: Alex_Plug">
+          <label>Nume Discord / Username *</label>
+          <input type="text" id="loginDiscordUser" required placeholder="ex: seekmao sau alex_plug">
         </div>
-        <button class="btn btn-discord-block" style="padding: 12px; font-size: 1.05rem;" onclick="handleMemberLogin()">
-          <i class="fa-brands fa-discord"></i> Conectare ca Membru
+        <div class="form-group text-left" style="text-align: left;">
+          <label>Parolă *</label>
+          <input type="password" id="loginPassword" required placeholder="Introdu parola ta...">
+        </div>
+        <button type="submit" class="btn btn-red-glow btn-block" style="padding: 12px; font-size: 1rem; margin-top: 8px;">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Intră în Cont
         </button>
-      </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 14px;">
+          Nu ai încă un cont? <a href="javascript:void(0)" onclick="switchAuthTab('register')" class="text-red">Creează cont aici</a>
+        </p>
+      </form>
 
-      <!-- Owner Tab -->
-      <div id="authOwnerPane" class="auth-pane">
-        <p class="text-muted" style="margin: 15px 0 16px; font-size: 13px;">
-          Panou exclusiv pentru <strong>Seek</strong> și <strong>Ghost</strong> pentru administrarea totală a comunității.
+      <!-- Tab 2: Înregistrare (Register) -->
+      <form id="authRegisterPane" class="auth-pane" onsubmit="handleAccountRegister(event)">
+        <p class="text-muted" style="margin: 12px 0 16px; font-size: 13px;">
+          Setează-ți contul și protejează-ți numele de Discord împotriva furtului de identitate.
         </p>
         <div class="form-group text-left" style="text-align: left;">
-          <label>Selectează Cont Owner</label>
-          <select id="ownerSelectUser">
-            <option value="Seek">Seek (Founder & Owner - @seekmao)</option>
-            <option value="Ghost">Ghost (Founder & Owner)</option>
-          </select>
+          <label>Nume Discord (Tag / Username) *</label>
+          <input type="text" id="regDiscordUser" required placeholder="ex: seekmao sau alex_plug">
         </div>
         <div class="form-group text-left" style="text-align: left;">
-          <label>PIN / Cod Acces Owner</label>
-          <input type="password" id="ownerPinCode" placeholder="Introdu codul de acces (implicit: bando2026)">
+          <label>Alege o Parolă Sigură *</label>
+          <input type="password" id="regPassword" required placeholder="Minim 4 caractere">
         </div>
-        <button class="btn btn-red-glow btn-block" style="padding: 12px; font-size: 1.05rem;" onclick="handleOwnerLogin()">
-          <i class="fa-solid fa-crown"></i> Autentificare ca Owner
+        <button type="submit" class="btn btn-discord-block" style="padding: 12px; font-size: 1rem; margin-top: 8px;">
+          <i class="fa-solid fa-shield-check"></i> Înregistrează Contul
         </button>
-      </div>
+      </form>
     </div>
   </div>
 

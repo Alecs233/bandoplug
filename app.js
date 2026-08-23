@@ -187,61 +187,155 @@ function updateAuthUI() {
 
 // Switch tabs in Login Modal
 function switchAuthTab(tab) {
-  const memberBtn = document.getElementById('tabMemberBtn');
-  const ownerBtn = document.getElementById('tabOwnerBtn');
-  const memberPane = document.getElementById('authMemberPane');
-  const ownerPane = document.getElementById('authOwnerPane');
+  const loginBtn = document.getElementById('tabLoginBtn');
+  const registerBtn = document.getElementById('tabRegisterBtn');
+  const loginPane = document.getElementById('authLoginPane');
+  const registerPane = document.getElementById('authRegisterPane');
 
-  if (tab === 'member') {
-    memberBtn.classList.add('active');
-    ownerBtn.classList.remove('active');
-    memberPane.classList.add('active');
-    ownerPane.classList.remove('active');
+  if (tab === 'login') {
+    if (loginBtn) loginBtn.classList.add('active');
+    if (registerBtn) registerBtn.classList.remove('active');
+    if (loginPane) loginPane.classList.add('active');
+    if (registerPane) registerPane.classList.remove('active');
   } else {
-    ownerBtn.classList.add('active');
-    memberBtn.classList.remove('active');
-    ownerPane.classList.add('active');
-    memberPane.classList.remove('active');
+    if (registerBtn) registerBtn.classList.add('active');
+    if (loginBtn) loginBtn.classList.remove('active');
+    if (registerPane) registerPane.classList.add('active');
+    if (loginPane) loginPane.classList.remove('active');
   }
 }
 
-// Member Login
-function handleMemberLogin() {
-  const nameInput = document.getElementById('memberLoginName');
-  const name = nameInput.value.trim() || 'Membru_Bando';
-  
-  saveAuthUser({
-    name: name,
-    role: 'member',
-    tag: '@' + name.toLowerCase()
-  });
-
-  closeModal('loginModal');
-  showToast(`Bun venit, ${name}! Te-ai conectat ca membru.`, 'success');
+// Account database management
+function getRegisteredAccounts() {
+  const saved = localStorage.getItem('bandoplug_accounts');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      return {};
+    }
+  }
+  return {};
 }
 
-// Owner Login (Seek or Ghost)
-function handleOwnerLogin() {
-  const selectedOwner = document.getElementById('ownerSelectUser').value;
-  const pinInput = document.getElementById('ownerPinCode').value.trim();
+function saveRegisteredAccounts(accounts) {
+  localStorage.setItem('bandoplug_accounts', JSON.stringify(accounts));
+}
 
-  // Validare PIN (acceptă bando2026 sau acces direct de la Seek/Ghost)
-  if (pinInput && pinInput !== 'bando2026' && pinInput !== 'seek' && pinInput !== 'ghost') {
-    showToast('PIN incorect! Folosește codul de acces autorizat.', 'error');
+// Check if username qualifies for Owner role
+function isOwnerUsername(username) {
+  const clean = username.toLowerCase().replace(/[@#]/g, '').trim();
+  return ['seekmao', 'seek', 'ghost', 'ghostmao'].includes(clean);
+}
+
+// Register new account
+function handleAccountRegister(e) {
+  e.preventDefault();
+  const userInput = document.getElementById('regDiscordUser');
+  const passInput = document.getElementById('regPassword');
+
+  const username = userInput.value.trim();
+  const password = passInput.value.trim();
+
+  if (!username || !password) return;
+
+  const accounts = getRegisteredAccounts();
+  const userKey = username.toLowerCase();
+
+  if (accounts[userKey]) {
+    showToast(`Numele "${username}" este deja înregistrat! Te rugăm să te conectezi.`, 'error');
+    switchAuthTab('login');
+    document.getElementById('loginDiscordUser').value = username;
     return;
   }
 
-  const ownerData = {
-    name: selectedOwner,
-    role: 'owner',
-    tag: selectedOwner === 'Seek' ? '@seekmao' : '@ghost'
+  const isOwner = isOwnerUsername(username);
+  const userRole = isOwner ? 'owner' : 'member';
+  const displayName = isOwner ? (userKey.includes('seek') ? 'Seek' : 'Ghost') : username;
+
+  accounts[userKey] = {
+    username: username,
+    displayName: displayName,
+    password: password,
+    role: userRole,
+    createdAt: new Date().toISOString()
   };
 
-  saveAuthUser(ownerData);
+  saveRegisteredAccounts(accounts);
+
+  const userData = {
+    name: displayName,
+    username: username,
+    role: userRole,
+    tag: '@' + username.toLowerCase()
+  };
+
+  saveAuthUser(userData);
   closeModal('loginModal');
-  showToast(`👑 Autentificare reușită! Bine ai venit, Owner ${selectedOwner}! Ai acces total la Panou.`, 'success');
-  renderAdminApplications();
-  switchView('admin');
+  userInput.value = '';
+  passInput.value = '';
+
+  if (isOwner) {
+    showToast(`👑 Contul de Owner (${displayName}) a fost creat și securizat cu succes! Ai acces total la Panou.`, 'success');
+    switchView('admin');
+  } else {
+    showToast(`Cont creat cu succes! Bun venit pe BandoPlug, ${displayName}.`, 'success');
+  }
+}
+
+// Login with existing account
+function handleAccountLogin(e) {
+  e.preventDefault();
+  const userInput = document.getElementById('loginDiscordUser');
+  const passInput = document.getElementById('loginPassword');
+
+  const username = userInput.value.trim();
+  const password = passInput.value.trim();
+
+  if (!username || !password) return;
+
+  const accounts = getRegisteredAccounts();
+  const userKey = username.toLowerCase();
+  const account = accounts[userKey];
+
+  if (!account && isOwnerUsername(username)) {
+    showToast(`Contul de Owner "${username}" nu a fost încă setat! Creează-l din tab-ul Înregistrare pentru a-ți alege parola secretă.`, 'info');
+    switchAuthTab('register');
+    document.getElementById('regDiscordUser').value = username;
+    return;
+  }
+
+  if (!account) {
+    showToast(`Contul "${username}" nu există! Creează-ți un cont din tab-ul Înregistrare.`, 'error');
+    switchAuthTab('register');
+    document.getElementById('regDiscordUser').value = username;
+    return;
+  }
+
+  if (account.password !== password) {
+    showToast('Parolă incorectă! Te rugăm să încerci din nou.', 'error');
+    return;
+  }
+
+  const isOwner = account.role === 'owner' || isOwnerUsername(account.username);
+  const userData = {
+    name: account.displayName || account.username,
+    username: account.username,
+    role: isOwner ? 'owner' : 'member',
+    tag: '@' + account.username.toLowerCase()
+  };
+
+  saveAuthUser(userData);
+  closeModal('loginModal');
+  userInput.value = '';
+  passInput.value = '';
+
+  if (isOwner) {
+    showToast(`👑 Bine ai revenit, Owner ${userData.name}! Panoul de control este activat.`, 'success');
+    switchView('admin');
+  } else {
+    showToast(`Te-ai conectat cu succes! Bun venit, ${userData.name}.`, 'success');
+  }
 }
 
 // Logout
