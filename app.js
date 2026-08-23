@@ -1,5 +1,5 @@
 /**
- * BandoPlug Community & Forum - Interactive Engine
+ * BandoPlug Community & Forum - Interactive Engine & Owner Admin System
  */
 
 // Initial Seed Topics for FiveM & Community Forum
@@ -32,7 +32,7 @@ Vă așteptăm pe server! Pentru probleme sau suport, folosiți canalul nostru d
     id: 2,
     category: 'anunturi',
     title: '📋 [GHID] Ghidul Începătorului & Cum să te Conectezi pe Server',
-    author: 'Alex_Plug (Head Admin)',
+    author: 'Ghost (Owner)',
     date: 'Ieri la 18:00',
     content: `Pentru a vă conecta pe serverul BandoPlug FiveM:
 1. Deschideți FiveM și apăsați tasta F8
@@ -73,7 +73,7 @@ Suntem gata pentru testul de roleplay administrativ.`,
     views: 245,
     pinned: false,
     replies: [
-      { author: 'Alex_Plug (Head Admin)', date: 'Astăzi la 10:15', content: 'Aplicație luată în considerare. Vă așteptăm pe Discord la camera de testare gang-uri.' }
+      { author: 'Seek (Founder & Owner)', date: 'Astăzi la 10:15', content: 'Aplicație luată în considerare. Vă așteptăm pe Discord la camera de testare gang-uri.' }
     ]
   },
   {
@@ -123,20 +123,137 @@ Suntem gata pentru testul de roleplay administrativ.`,
 
 // Current State
 let currentTopics = [];
+let currentApplications = [];
 let currentCategoryFilter = 'all';
 let currentViewingTopicId = null;
+let currentUser = null; // { name, role: 'owner'|'member', tag }
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
+  loadAuthUser();
   loadTopics();
+  loadApplications();
   renderTopics();
   setupEventListeners();
   updateStats();
+  updateAuthUI();
 });
+
+// Load auth state
+function loadAuthUser() {
+  const savedUser = localStorage.getItem('bandoplug_user');
+  if (savedUser) {
+    try {
+      currentUser = JSON.parse(savedUser);
+    } catch (e) {
+      currentUser = null;
+    }
+  }
+}
+
+function saveAuthUser(user) {
+  currentUser = user;
+  if (user) {
+    localStorage.setItem('bandoplug_user', JSON.stringify(user));
+  } else {
+    localStorage.removeItem('bandoplug_user');
+  }
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  const userBtnLabel = document.getElementById('userBtnLabel');
+  const navAdminLink = document.getElementById('navAdminLink');
+  const authorInput = document.getElementById('authorName');
+  const replyAuthorInput = document.getElementById('replyAuthor');
+
+  if (currentUser) {
+    if (currentUser.role === 'owner') {
+      if (userBtnLabel) userBtnLabel.innerHTML = `<span class="text-gold">👑 ${currentUser.name}</span>`;
+      if (navAdminLink) navAdminLink.style.display = 'flex';
+      if (authorInput) authorInput.value = `${currentUser.name} (Founder & Owner)`;
+      if (replyAuthorInput) replyAuthorInput.value = `${currentUser.name} (Owner)`;
+    } else {
+      if (userBtnLabel) userBtnLabel.innerText = currentUser.name;
+      if (navAdminLink) navAdminLink.style.display = 'none';
+      if (authorInput) authorInput.value = currentUser.name;
+      if (replyAuthorInput) replyAuthorInput.value = currentUser.name;
+    }
+  } else {
+    if (userBtnLabel) userBtnLabel.innerText = 'Conectare';
+    if (navAdminLink) navAdminLink.style.display = 'none';
+  }
+}
+
+// Switch tabs in Login Modal
+function switchAuthTab(tab) {
+  const memberBtn = document.getElementById('tabMemberBtn');
+  const ownerBtn = document.getElementById('tabOwnerBtn');
+  const memberPane = document.getElementById('authMemberPane');
+  const ownerPane = document.getElementById('authOwnerPane');
+
+  if (tab === 'member') {
+    memberBtn.classList.add('active');
+    ownerBtn.classList.remove('active');
+    memberPane.classList.add('active');
+    ownerPane.classList.remove('active');
+  } else {
+    ownerBtn.classList.add('active');
+    memberBtn.classList.remove('active');
+    ownerPane.classList.add('active');
+    memberPane.classList.remove('active');
+  }
+}
+
+// Member Login
+function handleMemberLogin() {
+  const nameInput = document.getElementById('memberLoginName');
+  const name = nameInput.value.trim() || 'Membru_Bando';
+  
+  saveAuthUser({
+    name: name,
+    role: 'member',
+    tag: '@' + name.toLowerCase()
+  });
+
+  closeModal('loginModal');
+  showToast(`Bun venit, ${name}! Te-ai conectat ca membru.`, 'success');
+}
+
+// Owner Login (Seek or Ghost)
+function handleOwnerLogin() {
+  const selectedOwner = document.getElementById('ownerSelectUser').value;
+  const pinInput = document.getElementById('ownerPinCode').value.trim();
+
+  // Validare PIN (acceptă bando2026 sau acces direct de la Seek/Ghost)
+  if (pinInput && pinInput !== 'bando2026' && pinInput !== 'seek' && pinInput !== 'ghost') {
+    showToast('PIN incorect! Folosește codul de acces autorizat.', 'error');
+    return;
+  }
+
+  const ownerData = {
+    name: selectedOwner,
+    role: 'owner',
+    tag: selectedOwner === 'Seek' ? '@seekmao' : '@ghost'
+  };
+
+  saveAuthUser(ownerData);
+  closeModal('loginModal');
+  showToast(`👑 Autentificare reușită! Bine ai venit, Owner ${selectedOwner}! Ai acces total la Panou.`, 'success');
+  renderAdminApplications();
+  switchView('admin');
+}
+
+// Logout
+function handleLogout() {
+  saveAuthUser(null);
+  switchView('home');
+  showToast('Te-ai deconectat cu succes.', 'info');
+}
 
 // Load from LocalStorage or use default
 function loadTopics() {
-  const saved = localStorage.getItem('bandoplug_topics_v2');
+  const saved = localStorage.getItem('bandoplug_topics_v3');
   if (saved) {
     try {
       currentTopics = JSON.parse(saved);
@@ -150,13 +267,100 @@ function loadTopics() {
 }
 
 function saveTopics() {
-  localStorage.setItem('bandoplug_topics_v2', JSON.stringify(currentTopics));
+  localStorage.setItem('bandoplug_topics_v3', JSON.stringify(currentTopics));
+}
+
+// Applications Management
+function loadApplications() {
+  const saved = localStorage.getItem('bandoplug_applications');
+  if (saved) {
+    try {
+      currentApplications = JSON.parse(saved);
+    } catch (e) {
+      currentApplications = [];
+    }
+  } else {
+    // Initial sample application for test
+    currentApplications = [
+      {
+        id: 101,
+        type: 'Staff / Helper',
+        realName: 'Marius, 17 ani',
+        discord: '@marius_rp',
+        rpName: 'Marco Bellini',
+        reason: 'Sunt activ zilnic peste 5 ore, am fost moderator pe alte 2 comunități mari de FiveM și știu regulamentul pe de rost.',
+        date: 'Azi la 11:00',
+        status: 'pending'
+      }
+    ];
+    saveApplications();
+  }
+}
+
+function saveApplications() {
+  localStorage.setItem('bandoplug_applications', JSON.stringify(currentApplications));
+  renderAdminApplications();
+}
+
+function renderAdminApplications() {
+  const list = document.getElementById('adminApplicationsList');
+  const countBadge = document.getElementById('adminAppsCount');
+  if (!list) return;
+
+  if (countBadge) countBadge.innerText = currentApplications.length;
+
+  if (currentApplications.length === 0) {
+    list.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px;">Nu există aplicații noi în așteptare.</div>`;
+    return;
+  }
+
+  list.innerHTML = currentApplications.map(app => `
+    <div class="app-review-card">
+      <div class="app-review-header">
+        <h4>${escapeHtml(app.type)} — <span style="color: var(--primary-red);">${escapeHtml(app.rpName)}</span></h4>
+        <span class="app-badge-status ${app.status}">${app.status === 'pending' ? 'În Așteptare' : (app.status === 'approved' ? 'Aprobat' : 'Respins')}</span>
+      </div>
+      <div class="app-review-meta">
+        <span><i class="fa-solid fa-user"></i> ${escapeHtml(app.realName)}</span>
+        <span><i class="fa-brands fa-discord text-blurple"></i> ${escapeHtml(app.discord)}</span>
+        <span><i class="fa-regular fa-clock"></i> ${escapeHtml(app.date)}</span>
+      </div>
+      <div class="app-review-reason">
+        ${escapeHtml(app.reason)}
+      </div>
+      <div class="app-review-actions">
+        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="ownerDeleteApp(${app.id})">
+          <i class="fa-solid fa-trash"></i> Șterge
+        </button>
+        <button class="btn btn-red-glow" style="padding: 6px 12px; font-size: 12px;" onclick="ownerSetAppStatus(${app.id}, 'rejected')">
+          <i class="fa-solid fa-xmark"></i> Respinge
+        </button>
+        <button class="btn btn-green" style="padding: 6px 12px; font-size: 12px;" onclick="ownerSetAppStatus(${app.id}, 'approved')">
+          <i class="fa-solid fa-check"></i> Aprobă
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function ownerSetAppStatus(appId, status) {
+  const app = currentApplications.find(a => a.id === appId);
+  if (app) {
+    app.status = status;
+    saveApplications();
+    showToast(`Aplicația a fost marcată ca "${status === 'approved' ? 'Aprobată' : 'Respinsă'}" de către Owner!`, 'success');
+  }
+}
+
+function ownerDeleteApp(appId) {
+  currentApplications = currentApplications.filter(a => a.id !== appId);
+  saveApplications();
+  showToast('Aplicație ștearsă din listă.', 'info');
 }
 
 // Render topics into respective categories
 function renderTopics(filteredList = null) {
   const listToRender = filteredList || currentTopics;
-
   const categories = ['anunturi', 'generale', 'ganguri', 'departamente', 'rapoarte', 'sugestii'];
 
   categories.forEach(cat => {
@@ -166,7 +370,6 @@ function renderTopics(filteredList = null) {
     const groupCard = container.closest('.forum-section-card');
     const catTopics = listToRender.filter(t => t.category === cat);
 
-    // If filtering by specific pill
     if (currentCategoryFilter !== 'all' && currentCategoryFilter !== cat) {
       if (groupCard) groupCard.style.display = 'none';
       return;
@@ -237,7 +440,6 @@ function selectCategory(category, buttonEl) {
 // Search Filter
 function filterTopics() {
   const query = document.getElementById('forumSearch').value.toLowerCase().trim();
-  
   let filtered = currentTopics;
 
   if (currentCategoryFilter !== 'all') {
@@ -255,7 +457,7 @@ function filterTopics() {
   renderTopics(filtered);
 }
 
-// View switcher (Home, Forum, Regulament, Aplicatii, Status)
+// View switcher
 function switchView(viewName) {
   document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active-view'));
   document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
@@ -275,6 +477,10 @@ function switchView(viewName) {
     if (navLink) navLink.classList.add('active');
   }
 
+  if (viewName === 'admin') {
+    renderAdminApplications();
+  }
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -289,12 +495,24 @@ function closeModal(id) {
   if (modal) modal.classList.remove('active-modal');
 }
 
-function openNewPostModal() {
+function openNewPostModal(preselectedCategory = null) {
+  if (preselectedCategory) {
+    document.getElementById('topicCategory').value = preselectedCategory;
+  }
   openModal('newPostModal');
 }
 
 function openLoginModal() {
-  openModal('loginModal');
+  if (currentUser) {
+    if (currentUser.role === 'owner') {
+      switchView('admin');
+      showToast(`Ești deja conectat ca Owner (${currentUser.name})!`, 'info');
+    } else {
+      showToast(`Ești conectat ca ${currentUser.name}.`, 'info');
+    }
+  } else {
+    openModal('loginModal');
+  }
 }
 
 // View Topic Detail
@@ -312,6 +530,16 @@ function viewTopicDetail(id) {
   document.getElementById('modalPostDate').innerText = topic.date;
   document.getElementById('modalPostContent').innerText = topic.content;
   document.getElementById('modalAuthorAvatar').innerText = topic.author.substring(0, 2).toUpperCase();
+
+  // Show Owner controls if logged in as owner
+  const ownerControls = document.getElementById('modalOwnerControls');
+  const btnPinLabel = document.getElementById('btnPinLabel');
+  if (currentUser && currentUser.role === 'owner') {
+    if (ownerControls) ownerControls.style.display = 'flex';
+    if (btnPinLabel) btnPinLabel.innerText = topic.pinned ? 'Anulează Fixare (Unpin)' : 'Fixează (PIN)';
+  } else {
+    if (ownerControls) ownerControls.style.display = 'none';
+  }
 
   renderModalReplies(topic.replies || []);
   openModal('topicDetailModal');
@@ -335,6 +563,29 @@ function renderModalReplies(replies) {
       <div style="color: var(--text-main); font-size: 13.5px;">${escapeHtml(r.content)}</div>
     </div>
   `).join('');
+}
+
+// Owner actions on current topic
+function ownerTogglePinCurrentTopic() {
+  if (!currentViewingTopicId || !currentUser || currentUser.role !== 'owner') return;
+  const topic = currentTopics.find(t => t.id === currentViewingTopicId);
+  if (topic) {
+    topic.pinned = !topic.pinned;
+    saveTopics();
+    renderTopics();
+    const btnPinLabel = document.getElementById('btnPinLabel');
+    if (btnPinLabel) btnPinLabel.innerText = topic.pinned ? 'Anulează Fixare (Unpin)' : 'Fixează (PIN)';
+    showToast(`Topicul a fost ${topic.pinned ? 'FIXAT în top' : 'DEZACTIVAT din top'} de către Owner!`, 'success');
+  }
+}
+
+function ownerDeleteCurrentTopic() {
+  if (!currentViewingTopicId || !currentUser || currentUser.role !== 'owner') return;
+  currentTopics = currentTopics.filter(t => t.id !== currentViewingTopicId);
+  saveTopics();
+  renderTopics();
+  closeModal('topicDetailModal');
+  showToast('👑 Topicul a fost ȘTERS de către conducere!', 'success');
 }
 
 // Add reply
@@ -374,6 +625,8 @@ function handleCreateTopic(e) {
 
   if (!title || !author || !content) return;
 
+  const isOwnerPosting = currentUser && currentUser.role === 'owner';
+
   const newTopic = {
     id: Date.now(),
     category: category,
@@ -382,7 +635,7 @@ function handleCreateTopic(e) {
     date: 'Chiar acum',
     content: content,
     views: 1,
-    pinned: false,
+    pinned: isOwnerPosting && category === 'anunturi',
     replies: []
   };
 
@@ -407,6 +660,21 @@ function handleApplicationSubmit(e) {
   const realName = document.getElementById('applicantRealName').value.trim();
   const discord = document.getElementById('applicantDiscord').value.trim();
   const rpName = document.getElementById('applicantRPName').value.trim();
+  const reason = document.getElementById('applicantReason').value.trim();
+
+  const newApp = {
+    id: Date.now(),
+    type: type,
+    realName: realName,
+    discord: discord,
+    rpName: rpName,
+    reason: reason,
+    date: 'Astăzi la ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    status: 'pending'
+  };
+
+  currentApplications.unshift(newApp);
+  saveApplications();
 
   closeModal('applyModal');
   document.getElementById('submitApplicationForm').reset();
@@ -414,11 +682,32 @@ function handleApplicationSubmit(e) {
   showToast(`Aplicația pentru "${type}" a fost trimisă cu succes către conducerea BandoPlug!`, 'success');
 }
 
-// Login simulation
-function mockLoginSuccess() {
-  closeModal('loginModal');
-  document.getElementById('userBtnLabel').innerText = 'Profil (Conectat)';
-  showToast('Te-ai conectat cu succes prin Discord!', 'success');
+// Owner controls: update displayed player counter & top announcement
+function adminUpdatePlayers() {
+  const count = document.getElementById('adminPlayerCountInput').value.trim();
+  if (!count) return;
+  const statEl = document.getElementById('statPlayers');
+  if (statEl) statEl.innerText = `${count} / 250`;
+  showToast(`Contorul de jucători a fost setat la ${count} / 250!`, 'success');
+}
+
+function adminUpdateAlert() {
+  const alertText = document.getElementById('adminAlertInput').value.trim();
+  if (!alertText) return;
+  const topText = document.querySelector('.top-text');
+  if (topText) {
+    topText.innerHTML = `<strong>ANUNȚ CONDUCERE:</strong> ${escapeHtml(alertText)}`;
+  }
+  showToast('Mesajul de alertă din bara superioară a fost actualizat!', 'success');
+}
+
+function adminResetForumDefault() {
+  if (confirm('Ești sigur că vrei să resetezi forumul la postările implicite?')) {
+    currentTopics = [...INITIAL_TOPICS];
+    saveTopics();
+    renderTopics();
+    showToast('Forumul a fost resetat la valorile inițiale.', 'info');
+  }
 }
 
 // Toast notification
@@ -427,7 +716,7 @@ function showToast(message, type = 'info') {
   const toast = document.createElement('div');
   toast.className = 'toast';
   toast.innerHTML = `
-    <i class="fa-solid fa-circle-check text-red" style="font-size: 18px;"></i>
+    <i class="fa-solid ${type === 'error' ? 'fa-triangle-exclamation text-red' : (type === 'success' ? 'fa-circle-check text-green' : 'fa-circle-info text-gold')}" style="font-size: 18px;"></i>
     <div>${message}</div>
   `;
   container.appendChild(toast);
@@ -442,8 +731,6 @@ function showToast(message, type = 'info') {
 // Update stats numbers
 function updateStats() {
   const totalTopics = currentTopics.length;
-  const totalReplies = currentTopics.reduce((acc, cur) => acc + (cur.replies ? cur.replies.length : 0), 0);
-
   const topicsStatEl = document.getElementById('statTopics');
   const sidebarTopicsEl = document.getElementById('sidebarTotalTopics');
 
@@ -457,7 +744,6 @@ function refreshServerStats() {
 
 // Setup general event listeners
 function setupEventListeners() {
-  // Copy IP button
   const copyBtn = document.getElementById('copyIpBtn');
   if (copyBtn) {
     copyBtn.addEventListener('click', () => {
@@ -466,7 +752,6 @@ function setupEventListeners() {
     });
   }
 
-  // Mobile menu toggle
   const mobileToggle = document.getElementById('mobileToggle');
   const navMenu = document.getElementById('navMenu');
   if (mobileToggle && navMenu) {
@@ -488,7 +773,6 @@ function setupEventListeners() {
   }
 }
 
-// Escape html helper
 function escapeHtml(str) {
   if (!str) return '';
   return str.replace(/[&<>'"]/g, 

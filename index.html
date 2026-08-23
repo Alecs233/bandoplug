@@ -52,6 +52,7 @@
         <a href="#regulament" class="nav-link" onclick="switchView('regulament')"><i class="fa-solid fa-book-skull"></i> Regulament</a>
         <a href="#aplicatii" class="nav-link" onclick="switchView('aplicatii')"><i class="fa-solid fa-file-pen"></i> Aplicații</a>
         <a href="#status" class="nav-link" onclick="switchView('status')"><i class="fa-solid fa-chart-line"></i> Status</a>
+        <a href="#admin" id="navAdminLink" class="nav-link text-gold" style="display:none;" onclick="switchView('admin')"><i class="fa-solid fa-crown text-gold"></i> Panou Owner</a>
         <a href="https://discord.gg/8cR9EA48US" target="_blank" class="nav-link discord-link"><i class="fa-brands fa-discord"></i> Discord</a>
       </nav>
 
@@ -597,6 +598,71 @@
       </div>
     </div>
 
+    <!-- VIEW 5: PANOU OWNER & ADMIN (Acces Seek & Ghost) -->
+    <div id="view-admin" class="app-view">
+      <div class="page-header-card" style="border-color: rgba(245, 158, 11, 0.4); background: radial-gradient(circle at 10% 20%, rgba(245, 158, 11, 0.08) 0%, var(--bg-surface) 60%);">
+        <div class="page-header-title">
+          <i class="fa-solid fa-crown text-gold" style="font-size: 40px;"></i>
+          <div>
+            <h1>Panou de Control Owner & Conducere</h1>
+            <p>Acces exclusiv pentru <strong>Seek</strong> și <strong>Ghost</strong> — Administrează aplicațiile, moderează forumul și anunțurile.</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-red-glow" onclick="openNewPostModal('anunturi')">
+            <i class="fa-solid fa-bullhorn"></i> Publică Anunț Oficial
+          </button>
+          <button class="btn btn-secondary" onclick="handleLogout()">
+            <i class="fa-solid fa-right-from-bracket"></i> Deconectare
+          </button>
+        </div>
+      </div>
+
+      <!-- Owner Stats Dashboard -->
+      <div class="admin-grid">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3><i class="fa-solid fa-file-signature text-red"></i> Aplicații Primite de la Jucători (<span id="adminAppsCount">0</span>)</h3>
+            <span class="badge-count">Recrutări</span>
+          </div>
+          <div class="admin-apps-list" id="adminApplicationsList">
+            <!-- Dynamic Applications from localStorage -->
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3><i class="fa-solid fa-screwdriver-wrench text-gold"></i> Acțiuni Rapide Conducere</h3>
+          </div>
+          <div class="admin-quick-controls">
+            <div class="control-box">
+              <label>Schimbă Jucători Online Afișați:</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="adminPlayerCountInput" value="184" style="padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; border-radius: 6px; width: 100px;">
+                <button class="btn btn-red-glow" onclick="adminUpdatePlayers()">Actualizează</button>
+              </div>
+            </div>
+
+            <div class="control-box">
+              <label>Mesaj Alertă Conducere (Top Bar):</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="adminAlertInput" placeholder="ex: Wipe & Concurs diseară la ora 20:00!" style="padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; border-radius: 6px; flex-grow: 1;">
+                <button class="btn btn-red-glow" onclick="adminUpdateAlert()">Trimite</button>
+              </div>
+            </div>
+
+            <div class="control-box" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+              <label>Moderare & Curățare Forum:</label>
+              <p class="text-muted" style="font-size: 12px; margin-bottom: 10px;">Ca Owner, poți șterge sau fixa (PIN) orice topic direct dând click pe el pe forum.</p>
+              <button class="btn btn-secondary" onclick="adminResetForumDefault()">
+                <i class="fa-solid fa-arrows-rotate"></i> Resetează Forum la Valorile Implicite
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- MODAL: Creează Topic Nou -->
@@ -666,6 +732,21 @@
           <div class="post-content-text" id="modalPostContent">
             Conținutul topicului...
           </div>
+          
+          <!-- Owner Controls inside Topic -->
+          <div id="modalOwnerControls" style="display: none; margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(245, 158, 11, 0.3); justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div style="font-size: 12px; color: var(--gold-accent); font-weight: 700;">
+              <i class="fa-solid fa-shield-halved"></i> Acțiuni Owner:
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="ownerTogglePinCurrentTopic()">
+                <i class="fa-solid fa-thumbtack text-gold"></i> <span id="btnPinLabel">Fixează (PIN)</span>
+              </button>
+              <button class="btn btn-red-glow" style="padding: 6px 12px; font-size: 12px;" onclick="ownerDeleteCurrentTopic()">
+                <i class="fa-solid fa-trash"></i> Șterge Topic
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Replies Section -->
@@ -727,20 +808,55 @@
     </div>
   </div>
 
-  <!-- MODAL: Conectare Discord -->
+  <!-- MODAL: Conectare Discord & Owner -->
   <div class="modal-overlay" id="loginModal">
     <div class="modal-card modal-small text-center">
       <div class="modal-header justify-center">
-        <img src="assets/bandoplug.png" alt="BandoPlug" style="width: 70px; margin: 0 auto 10px;">
-        <h3>Conectare la BandoPlug</h3>
+        <img src="bandoplug.png" onerror="this.onerror=null; this.src='assets/bandoplug.png';" alt="BandoPlug" style="width: 75px; margin: 0 auto 10px;">
+        <h3>Autentificare BandoPlug</h3>
         <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
       </div>
-      <p class="text-muted" style="margin-bottom: 20px;">
-        Conectează-te cu contul tău de Discord pentru a sincroniza rolurile, badge-urile și postările de pe forum.
-      </p>
-      <a href="https://discord.gg/8cR9EA48US" target="_blank" class="btn btn-discord-block" style="padding: 12px; font-size: 1.05rem;" onclick="mockLoginSuccess()">
-        <i class="fa-brands fa-discord"></i> Conectează-te prin Discord
-      </a>
+      
+      <!-- Login Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tabMemberBtn" onclick="switchAuthTab('member')"><i class="fa-brands fa-discord"></i> Membru</button>
+        <button class="auth-tab-btn" id="tabOwnerBtn" onclick="switchAuthTab('owner')"><i class="fa-solid fa-crown text-gold"></i> Conducere / Owner</button>
+      </div>
+
+      <!-- Member Tab -->
+      <div id="authMemberPane" class="auth-pane active">
+        <p class="text-muted" style="margin: 15px 0 20px; font-size: 13.5px;">
+          Conectează-te cu contul tău de Discord pentru a sincroniza profilul și a posta pe forum.
+        </p>
+        <div class="form-group text-left" style="text-align: left;">
+          <label>Nume Utilizator / Discord</label>
+          <input type="text" id="memberLoginName" placeholder="ex: Alex_Plug">
+        </div>
+        <button class="btn btn-discord-block" style="padding: 12px; font-size: 1.05rem;" onclick="handleMemberLogin()">
+          <i class="fa-brands fa-discord"></i> Conectare ca Membru
+        </button>
+      </div>
+
+      <!-- Owner Tab -->
+      <div id="authOwnerPane" class="auth-pane">
+        <p class="text-muted" style="margin: 15px 0 16px; font-size: 13px;">
+          Panou exclusiv pentru <strong>Seek</strong> și <strong>Ghost</strong> pentru administrarea totală a comunității.
+        </p>
+        <div class="form-group text-left" style="text-align: left;">
+          <label>Selectează Cont Owner</label>
+          <select id="ownerSelectUser">
+            <option value="Seek">Seek (Founder & Owner - @seekmao)</option>
+            <option value="Ghost">Ghost (Founder & Owner)</option>
+          </select>
+        </div>
+        <div class="form-group text-left" style="text-align: left;">
+          <label>PIN / Cod Acces Owner</label>
+          <input type="password" id="ownerPinCode" placeholder="Introdu codul de acces (implicit: bando2026)">
+        </div>
+        <button class="btn btn-red-glow btn-block" style="padding: 12px; font-size: 1.05rem;" onclick="handleOwnerLogin()">
+          <i class="fa-solid fa-crown"></i> Autentificare ca Owner
+        </button>
+      </div>
     </div>
   </div>
 
@@ -752,7 +868,7 @@
     <div class="container footer-content">
       <div class="footer-brand">
         <div class="brand-logo footer-logo">
-          <img src="assets/bandoplug.png" alt="BandoPlug" class="nav-logo-img">
+          <img src="bandoplug.png" onerror="this.onerror=null; this.src='assets/bandoplug.png';" alt="BandoPlug" class="nav-logo-img">
           <div class="brand-text">
             <span class="brand-title">BANDO<span>PLUG</span></span>
             <span class="brand-subtitle">COMMUNITY & FORUM</span>
