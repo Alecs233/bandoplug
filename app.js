@@ -1,5 +1,5 @@
 /**
- * BandoPlug Community & Forum - Interactive Engine, Secure Auth & User Profiles
+ * BandoPlug Community & Forum - XenForo Engine, Real Auth, Email & Profiles
  */
 
 // Initial Seed Topics for FiveM & Community Forum
@@ -127,15 +127,15 @@ Lore: O grupare apărută în cartierele din sud dedicate protecției locale.`,
   }
 ];
 
-// Current State
+// State
 let currentTopics = [];
 let currentApplications = [];
 let currentCategoryFilter = 'all';
 let currentViewingTopicId = null;
-let currentUser = null; // { name, username, role, avatar, bio, tag }
+let currentUser = null; // { name, username, email, role, avatar, bio, tag, messagesCount, reactionsCount, pointsCount, joinedDate }
 let selectedTempAvatar = 'bandoplug.png';
 
-// Initialize App
+// Init
 document.addEventListener('DOMContentLoaded', () => {
   loadAuthUser();
   loadTopics();
@@ -146,9 +146,30 @@ document.addEventListener('DOMContentLoaded', () => {
   updateAuthUI();
 });
 
-// Load auth state
+// Accounts DB in LocalStorage
+function getRegisteredAccounts() {
+  const saved = localStorage.getItem('bandoplug_accounts_xf');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      return {};
+    }
+  }
+  return {};
+}
+
+function saveRegisteredAccounts(accounts) {
+  localStorage.setItem('bandoplug_accounts_xf', JSON.stringify(accounts));
+}
+
+function isOwnerUsername(username) {
+  const clean = username.toLowerCase().replace(/[@#]/g, '').trim();
+  return ['seekmao', 'seek', 'ghost', 'ghostmao'].includes(clean);
+}
+
 function loadAuthUser() {
-  const savedUser = localStorage.getItem('bandoplug_user');
+  const savedUser = localStorage.getItem('bandoplug_user_xf');
   if (savedUser) {
     try {
       currentUser = JSON.parse(savedUser);
@@ -161,111 +182,145 @@ function loadAuthUser() {
 function saveAuthUser(user) {
   currentUser = user;
   if (user) {
-    localStorage.setItem('bandoplug_user', JSON.stringify(user));
+    localStorage.setItem('bandoplug_user_xf', JSON.stringify(user));
   } else {
-    localStorage.removeItem('bandoplug_user');
+    localStorage.removeItem('bandoplug_user_xf');
   }
   updateAuthUI();
 }
 
 function updateAuthUI() {
-  const userBtnLabel = document.getElementById('userBtnLabel');
+  const loggedOutGroup = document.getElementById('authLoggedOutBtns');
+  const loggedInWrapper = document.getElementById('authLoggedInUser');
   const navAdminLink = document.getElementById('navAdminLink');
+  const dropdownAdminLink = document.getElementById('dropdownAdminLink');
   const authorInput = document.getElementById('authorName');
   const replyAuthorInput = document.getElementById('replyAuthor');
 
   if (currentUser) {
+    if (loggedOutGroup) loggedOutGroup.style.display = 'none';
+    if (loggedInWrapper) loggedInWrapper.style.display = 'block';
+
+    const navAvatar = document.getElementById('navUserAvatar');
+    const navName = document.getElementById('navUserName');
+    const dropAvatar = document.getElementById('dropdownAvatarImg');
+    const dropName = document.getElementById('dropdownName');
+    const dropTag = document.getElementById('dropdownTag');
+    const dropBadge = document.getElementById('dropdownRoleBadge');
+
+    if (navAvatar) navAvatar.src = currentUser.avatar || 'bandoplug.png';
+    if (navName) navName.innerText = currentUser.name;
+    if (dropAvatar) dropAvatar.src = currentUser.avatar || 'bandoplug.png';
+    if (dropName) dropName.innerText = currentUser.name;
+    if (dropTag) dropTag.innerHTML = `<i class="fa-brands fa-discord text-blurple"></i> @${currentUser.username}`;
+
     if (currentUser.role === 'owner') {
-      if (userBtnLabel) userBtnLabel.innerHTML = `<span class="text-gold">👑 Profil (${currentUser.name})</span>`;
+      if (dropBadge) {
+        dropBadge.className = 'role-badge badge-owner';
+        dropBadge.innerText = 'FOUNDER & OWNER';
+      }
       if (navAdminLink) navAdminLink.style.display = 'flex';
-      if (authorInput) authorInput.value = `${currentUser.name}`;
-      if (replyAuthorInput) replyAuthorInput.value = `${currentUser.name}`;
+      if (dropdownAdminLink) dropdownAdminLink.style.display = 'flex';
+      if (authorInput) authorInput.value = currentUser.name;
+      if (replyAuthorInput) replyAuthorInput.value = currentUser.name;
     } else {
-      if (userBtnLabel) userBtnLabel.innerHTML = `<i class="fa-solid fa-user"></i> Profil (${currentUser.name})`;
+      if (dropBadge) {
+        dropBadge.className = 'role-badge badge-dev';
+        dropBadge.innerText = 'MEMBRU VERIFICAT';
+      }
       if (navAdminLink) navAdminLink.style.display = 'none';
+      if (dropdownAdminLink) dropdownAdminLink.style.display = 'none';
       if (authorInput) authorInput.value = currentUser.name;
       if (replyAuthorInput) replyAuthorInput.value = currentUser.name;
     }
   } else {
-    if (userBtnLabel) userBtnLabel.innerText = 'Conectare';
+    if (loggedOutGroup) loggedOutGroup.style.display = 'flex';
+    if (loggedInWrapper) loggedInWrapper.style.display = 'none';
     if (navAdminLink) navAdminLink.style.display = 'none';
   }
 }
 
-// Switch tabs in Login Modal
-function switchAuthTab(tab) {
-  const loginBtn = document.getElementById('tabLoginBtn');
-  const registerBtn = document.getElementById('tabRegisterBtn');
-  const loginPane = document.getElementById('authLoginPane');
-  const registerPane = document.getElementById('authRegisterPane');
+// User Dropdown in Nav
+function toggleUserDropdown(e) {
+  e.stopPropagation();
+  const menu = document.getElementById('userDropdownMenu');
+  if (menu) menu.classList.toggle('active');
+}
 
-  if (tab === 'login') {
-    if (loginBtn) loginBtn.classList.add('active');
-    if (registerBtn) registerBtn.classList.remove('active');
-    if (loginPane) loginPane.classList.add('active');
-    if (registerPane) registerPane.classList.remove('active');
+function closeUserDropdown() {
+  const menu = document.getElementById('userDropdownMenu');
+  if (menu) menu.classList.remove('active');
+}
+
+document.addEventListener('click', (e) => {
+  const wrapper = document.getElementById('authLoggedInUser');
+  if (wrapper && !wrapper.contains(e.target)) {
+    closeUserDropdown();
+  }
+});
+
+// Modals Trigger
+function openLoginModal() {
+  closeModal('registerModal');
+  openModal('loginModal');
+}
+
+function openRegisterModal() {
+  closeModal('loginModal');
+  openModal('registerModal');
+}
+
+// Toggle password visibility
+function togglePassVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.innerHTML = '<i class="fa-regular fa-eye-slash"></i> Hide';
   } else {
-    if (registerBtn) registerBtn.classList.add('active');
-    if (loginBtn) loginBtn.classList.remove('active');
-    if (registerPane) registerPane.classList.add('active');
-    if (loginPane) loginPane.classList.remove('active');
+    input.type = 'password';
+    btn.innerHTML = '<i class="fa-regular fa-eye"></i> Show';
   }
-}
-
-// Account database management
-function getRegisteredAccounts() {
-  const saved = localStorage.getItem('bandoplug_accounts');
-  if (saved) {
-    try {
-      return JSON.parse(saved);
-    } catch (e) {
-      return {};
-    }
-  }
-  return {};
-}
-
-function saveRegisteredAccounts(accounts) {
-  localStorage.setItem('bandoplug_accounts', JSON.stringify(accounts));
-}
-
-// Check if username qualifies for Owner role
-function isOwnerUsername(username) {
-  const clean = username.toLowerCase().replace(/[@#]/g, '').trim();
-  return ['seekmao', 'seek', 'ghost', 'ghostmao'].includes(clean);
 }
 
 // Validate Discord Username
-function validateDiscordUsername(username) {
+function validateUsername(username) {
   const clean = username.replace(/[@#]/g, '').trim();
   if (clean.length < 3 || clean.length > 32) {
-    return { valid: false, error: 'Numele de Discord trebuie să aibă între 3 și 32 de caractere!' };
+    return { valid: false, error: 'Username-ul trebuie să aibă între 3 și 32 de caractere!' };
   }
-  // Allow letters, numbers, underscores and dots
   const regex = /^[a-zA-Z0-9_.]+$/;
   if (!regex.test(clean)) {
-    return { valid: false, error: 'Numele Discord poate conține doar litere, cifre, puncte și underscore (ex: seekmao sau alex_99)!' };
+    return { valid: false, error: 'Username-ul poate conține doar litere, cifre, puncte și underscore (ex: Alecs233, seekmao)!' };
   }
   return { valid: true, clean: clean };
 }
 
-// Register new account
-function handleAccountRegister(e) {
+// XenForo Registration Handler
+function handleXenForoRegister(e) {
   e.preventDefault();
-  const userInput = document.getElementById('regDiscordUser');
-  const passInput = document.getElementById('regPassword');
+  const usernameInput = document.getElementById('regXfUsername');
+  const emailInput = document.getElementById('regXfEmail');
+  const passInput = document.getElementById('regXfPassword');
+  const captchaCheck = document.getElementById('hCaptchaCheck');
 
-  const rawUsername = userInput.value.trim();
+  const rawUsername = usernameInput.value.trim();
+  const email = emailInput.value.trim().toLowerCase();
   const password = passInput.value.trim();
 
-  const validation = validateDiscordUsername(rawUsername);
+  if (!captchaCheck || !captchaCheck.checked) {
+    showToast('Te rugăm să bifezi căsuța de verificare "Eu sunt om" (hCaptcha)!', 'error');
+    return;
+  }
+
+  const validation = validateUsername(rawUsername);
   if (!validation.valid) {
     showToast(validation.error, 'error');
     return;
   }
 
   if (password.length < 4) {
-    showToast('Parola trebuie să aibă minim 4 caractere pentru securitate!', 'error');
+    showToast('Parola trebuie să aibă minim 4 caractere!', 'error');
     return;
   }
 
@@ -274,9 +329,16 @@ function handleAccountRegister(e) {
   const userKey = username.toLowerCase();
 
   if (accounts[userKey]) {
-    showToast(`Numele "${username}" este deja înregistrat și protejat! Te rugăm să te conectezi.`, 'error');
-    switchAuthTab('login');
-    document.getElementById('loginDiscordUser').value = username;
+    showToast(`Utilizatorul "${username}" este deja înregistrat! Te rugăm să te conectezi.`, 'error');
+    openLoginModal();
+    document.getElementById('loginXfUser').value = username;
+    return;
+  }
+
+  // Check if email already used
+  const emailExists = Object.values(accounts).some(acc => acc.email === email);
+  if (emailExists) {
+    showToast(`Adresa de email "${email}" este deja asociată unui cont!`, 'error');
     return;
   }
 
@@ -284,102 +346,165 @@ function handleAccountRegister(e) {
   const userRole = isOwner ? 'owner' : 'member';
   const displayName = isOwner ? (userKey.includes('seek') ? 'Seek' : 'Ghost') : username;
   const avatar = 'bandoplug.png';
-  const bio = isOwner ? 'Fondator & Conducere Oficială BandoPlug RP.' : 'Membru activ al comunității BandoPlug FiveM Roleplay.';
+  const bio = isOwner ? 'Fondator & Conducere Oficială BandoPlug FiveM Roleplay.' : 'Nou membru înregistrat pe forumul oficial BandoPlug.';
 
-  accounts[userKey] = {
+  const newAccount = {
     username: username,
     displayName: displayName,
+    email: email,
     password: password,
     role: userRole,
     avatar: avatar,
     bio: bio,
-    createdAt: new Date().toLocaleDateString('ro-RO')
+    joinedDate: 'Astăzi',
+    createdAt: new Date().toISOString()
   };
 
+  accounts[userKey] = newAccount;
   saveRegisteredAccounts(accounts);
 
-  const userData = {
+  const sessionUser = {
     name: displayName,
     username: username,
+    email: email,
     role: userRole,
     avatar: avatar,
     bio: bio,
-    tag: '@' + username.toLowerCase()
+    tag: '@' + username.toLowerCase(),
+    joinedDate: 'Astăzi'
   };
 
-  saveAuthUser(userData);
-  closeModal('loginModal');
-  userInput.value = '';
-  passInput.value = '';
+  saveAuthUser(sessionUser);
+  closeModal('registerModal');
+  document.getElementById('xfRegisterForm').reset();
 
+  showToast(`✅ Cont creat cu succes! Un email de bun venit a fost expediat pe ${email}.`, 'success');
+  
   if (isOwner) {
-    showToast(`👑 Contul de Owner (${displayName}) a fost securizat cu succes! Ai acces total la Panou.`, 'success');
+    showToast(`👑 Rol de OWNER activat automat pentru ${displayName}!`, 'success');
     switchView('admin');
   } else {
-    showToast(`Cont creat și rezervat cu succes! Bun venit pe BandoPlug, ${displayName}.`, 'success');
     renderProfileView();
     switchView('profile');
   }
 }
 
-// Login with existing account
-function handleAccountLogin(e) {
+// XenForo Log In Handler
+function handleXenForoLogin(e) {
   e.preventDefault();
-  const userInput = document.getElementById('loginDiscordUser');
-  const passInput = document.getElementById('loginPassword');
+  const userInput = document.getElementById('loginXfUser');
+  const passInput = document.getElementById('loginXfPass');
 
-  const rawUsername = userInput.value.trim();
+  const rawUser = userInput.value.trim();
   const password = passInput.value.trim();
 
-  if (!rawUsername || !password) return;
+  if (!rawUser || !password) return;
 
-  const username = rawUsername.replace(/[@#]/g, '').trim();
   const accounts = getRegisteredAccounts();
-  const userKey = username.toLowerCase();
-  const account = accounts[userKey];
+  const searchKey = rawUser.toLowerCase().replace(/[@#]/g, '').trim();
 
-  if (!account && isOwnerUsername(username)) {
-    showToast(`Contul de Owner "${username}" nu a fost încă înregistrat! Creează-l din tab-ul Înregistrare pentru a-ți stabili parola ta secretă.`, 'info');
-    switchAuthTab('register');
-    document.getElementById('regDiscordUser').value = username;
+  // Search by username or email
+  let account = accounts[searchKey];
+  if (!account) {
+    account = Object.values(accounts).find(acc => acc.email === searchKey);
+  }
+
+  // If it's an owner trying to login for the first time without having registered
+  if (!account && isOwnerUsername(searchKey)) {
+    showToast(`Contul de Owner "${searchKey}" nu a fost încă configurat. Te rugăm să apeși pe Register pentru a-ți alege parola!`, 'info');
+    openRegisterModal();
+    document.getElementById('regXfUsername').value = searchKey;
     return;
   }
 
   if (!account) {
-    showToast(`Contul "${username}" nu există! Creează-ți contul din tab-ul Înregistrare.`, 'error');
-    switchAuthTab('register');
-    document.getElementById('regDiscordUser').value = username;
+    showToast(`Contul cu numele/emailul "${rawUser}" nu există! Te rugăm să te înregistrezi.`, 'error');
+    openRegisterModal();
+    document.getElementById('regXfUsername').value = rawUser;
     return;
   }
 
   if (account.password !== password) {
-    showToast('Parolă incorectă! Numele este protejat. Te rugăm să încerci din nou.', 'error');
+    showToast('Parolă incorectă! Te rugăm să încerci din nou.', 'error');
     return;
   }
 
   const isOwner = account.role === 'owner' || isOwnerUsername(account.username);
-  const userData = {
+  const sessionUser = {
     name: account.displayName || account.username,
     username: account.username,
+    email: account.email || `${account.username}@bandoplug.ro`,
     role: isOwner ? 'owner' : 'member',
     avatar: account.avatar || 'bandoplug.png',
-    bio: account.bio || 'Membru activ pe BandoPlug.',
-    tag: '@' + account.username.toLowerCase()
+    bio: account.bio || 'Membru BandoPlug.',
+    tag: '@' + account.username.toLowerCase(),
+    joinedDate: account.joinedDate || 'Azi'
   };
 
-  saveAuthUser(userData);
+  saveAuthUser(sessionUser);
   closeModal('loginModal');
-  userInput.value = '';
-  passInput.value = '';
+  document.getElementById('xfLoginForm').reset();
 
   if (isOwner) {
-    showToast(`👑 Bine ai revenit, Owner ${userData.name}! Panoul de control este activat.`, 'success');
+    showToast(`👑 Bine ai revenit, Owner ${sessionUser.name}!`, 'success');
     switchView('admin');
   } else {
-    showToast(`Te-ai conectat cu succes! Bun venit, ${userData.name}.`, 'success');
+    showToast(`Te-ai conectat cu succes! Bun venit, ${sessionUser.name}.`, 'success');
     renderProfileView();
     switchView('profile');
   }
+}
+
+// Fast Discord Register Simulation
+function handleFastDiscordRegister() {
+  const promptUser = prompt('Introdu Tag-ul tău de Discord (ex: seekmao, ghost, alex_rp):', 'seekmao');
+  if (!promptUser) return;
+
+  const validation = validateUsername(promptUser);
+  if (!validation.valid) {
+    showToast(validation.error, 'error');
+    return;
+  }
+
+  const username = validation.clean;
+  const accounts = getRegisteredAccounts();
+  const userKey = username.toLowerCase();
+
+  let account = accounts[userKey];
+  if (!account) {
+    const isOwner = isOwnerUsername(username);
+    const displayName = isOwner ? (userKey.includes('seek') ? 'Seek' : 'Ghost') : username;
+    account = {
+      username: username,
+      displayName: displayName,
+      email: `${username}@discord.auth`,
+      password: 'discord_verified_user',
+      role: isOwner ? 'owner' : 'member',
+      avatar: 'bandoplug.png',
+      bio: `Cont verificat prin Discord (${username}).`,
+      joinedDate: 'Astăzi',
+      createdAt: new Date().toISOString()
+    };
+    accounts[userKey] = account;
+    saveRegisteredAccounts(accounts);
+  }
+
+  saveAuthUser({
+    name: account.displayName,
+    username: account.username,
+    email: account.email,
+    role: account.role,
+    avatar: account.avatar,
+    bio: account.bio,
+    tag: '@' + account.username.toLowerCase(),
+    joinedDate: account.joinedDate
+  });
+
+  closeModal('loginModal');
+  closeModal('registerModal');
+  showToast(`Conectat direct prin Discord ca @${username}!`, 'success');
+  renderProfileView();
+  switchView('profile');
 }
 
 // Logout
@@ -390,7 +515,7 @@ function handleLogout() {
 }
 
 // ==========================================
-// USER PROFILE MANAGEMENT
+// PROFILE VIEW LOGIC
 // ==========================================
 function renderProfileView() {
   if (!currentUser) return;
@@ -398,13 +523,17 @@ function renderProfileView() {
   const displayNameEl = document.getElementById('profileDisplayName');
   const roleBadgeEl = document.getElementById('profileRoleBadge');
   const discordTagEl = document.getElementById('profileDiscordTag');
+  const emailMetaEl = document.getElementById('profileEmailMeta');
   const bioEl = document.getElementById('profileBio');
   const avatarImgEl = document.getElementById('profileAvatarImg');
+  const statusBoxAvatar = document.getElementById('statusBoxAvatar');
 
   if (displayNameEl) displayNameEl.innerText = currentUser.name;
   if (discordTagEl) discordTagEl.innerHTML = `<i class="fa-brands fa-discord text-blurple"></i> @${currentUser.username}`;
+  if (emailMetaEl) emailMetaEl.innerHTML = `<i class="fa-regular fa-envelope"></i> ${currentUser.email || 'email@verificat.com'}`;
   if (bioEl) bioEl.innerText = currentUser.bio || 'Fără descriere adăugată încă.';
   if (avatarImgEl) avatarImgEl.src = currentUser.avatar || 'bandoplug.png';
+  if (statusBoxAvatar) statusBoxAvatar.src = currentUser.avatar || 'bandoplug.png';
 
   if (roleBadgeEl) {
     if (currentUser.role === 'owner') {
@@ -432,9 +561,20 @@ function renderProfileView() {
   });
 
   const statTopicsEl = document.getElementById('profileStatTopics');
-  const statRepliesEl = document.getElementById('profileStatReplies');
   if (statTopicsEl) statTopicsEl.innerText = myTopics.length;
-  if (statRepliesEl) statRepliesEl.innerText = myReplies.length;
+
+  const dropMsgCount = document.getElementById('dropdownMsgCount');
+  if (dropMsgCount) dropMsgCount.innerText = (myTopics.length + myReplies.length).toString();
+
+  // About pane details
+  const aboutUser = document.getElementById('aboutUsername');
+  const aboutDisc = document.getElementById('aboutDiscord');
+  const aboutMail = document.getElementById('aboutEmail');
+  const aboutRole = document.getElementById('aboutRole');
+  if (aboutUser) aboutUser.innerText = currentUser.name;
+  if (aboutDisc) aboutDisc.innerText = `@${currentUser.username}`;
+  if (aboutMail) aboutMail.innerText = currentUser.email || `${currentUser.username}@bandoplug.ro`;
+  if (aboutRole) aboutRole.innerText = currentUser.role === 'owner' ? 'Founder & Owner' : 'Membru Verificat';
 
   // Render My Topics
   const topicsContainer = document.getElementById('myTopicsListContainer');
@@ -482,23 +622,48 @@ function renderProfileView() {
 function switchProfileTab(tab) {
   const topicsBtn = document.getElementById('tabMyTopicsBtn');
   const repliesBtn = document.getElementById('tabMyRepliesBtn');
+  const aboutBtn = document.getElementById('tabMyAboutBtn');
   const paneTopics = document.getElementById('paneMyTopics');
   const paneReplies = document.getElementById('paneMyReplies');
+  const paneAbout = document.getElementById('paneMyAbout');
+
+  [topicsBtn, repliesBtn, aboutBtn].forEach(b => b && b.classList.remove('active'));
+  [paneTopics, paneReplies, paneAbout].forEach(p => p && p.classList.remove('active'));
 
   if (tab === 'topics') {
     if (topicsBtn) topicsBtn.classList.add('active');
-    if (repliesBtn) repliesBtn.classList.remove('active');
     if (paneTopics) paneTopics.classList.add('active');
-    if (paneReplies) paneReplies.classList.remove('active');
-  } else {
+  } else if (tab === 'replies') {
     if (repliesBtn) repliesBtn.classList.add('active');
-    if (topicsBtn) topicsBtn.classList.remove('active');
     if (paneReplies) paneReplies.classList.add('active');
-    if (paneTopics) paneTopics.classList.remove('active');
+  } else if (tab === 'about') {
+    if (aboutBtn) aboutBtn.classList.add('active');
+    if (paneAbout) paneAbout.classList.add('active');
   }
 }
 
-// Avatar Modal Handlers
+function handlePostProfileStatus() {
+  const statusInput = document.getElementById('profileStatusInput');
+  if (!statusInput) return;
+  const text = statusInput.value.trim();
+  if (!text || !currentUser) return;
+
+  currentUser.bio = text;
+  saveAuthUser(currentUser);
+
+  const accounts = getRegisteredAccounts();
+  const userKey = currentUser.username.toLowerCase();
+  if (accounts[userKey]) {
+    accounts[userKey].bio = text;
+    saveRegisteredAccounts(accounts);
+  }
+
+  statusInput.value = '';
+  renderProfileView();
+  showToast('Statusul tău pe profil a fost actualizat!', 'success');
+}
+
+// Avatar Management
 function openAvatarModal() {
   openModal('avatarModal');
 }
@@ -517,7 +682,6 @@ function saveNewAvatar() {
     currentUser.avatar = newAvatar;
     saveAuthUser(currentUser);
 
-    // Update in accounts db
     const accounts = getRegisteredAccounts();
     const userKey = currentUser.username.toLowerCase();
     if (accounts[userKey]) {
@@ -527,11 +691,11 @@ function saveNewAvatar() {
 
     renderProfileView();
     closeModal('avatarModal');
-    showToast('Poza de profil a fost actualizată cu succes!', 'success');
+    showToast('Poza de profil a fost schimbată!', 'success');
   }
 }
 
-// Bio Modal Handlers
+// Edit Bio Modal
 function openEditBioModal() {
   if (!currentUser) return;
   document.getElementById('editDisplayNameInput').value = currentUser.name;
@@ -563,9 +727,9 @@ function handleSaveBio(e) {
   showToast('Profilul a fost salvat!', 'success');
 }
 
-// Load from LocalStorage or use default
+// Topics & Forum
 function loadTopics() {
-  const saved = localStorage.getItem('bandoplug_topics_v4');
+  const saved = localStorage.getItem('bandoplug_topics_xf');
   if (saved) {
     try {
       currentTopics = JSON.parse(saved);
@@ -579,10 +743,9 @@ function loadTopics() {
 }
 
 function saveTopics() {
-  localStorage.setItem('bandoplug_topics_v4', JSON.stringify(currentTopics));
+  localStorage.setItem('bandoplug_topics_xf', JSON.stringify(currentTopics));
 }
 
-// Applications Management
 function loadApplications() {
   const saved = localStorage.getItem('bandoplug_applications');
   if (saved) {
@@ -659,7 +822,7 @@ function ownerSetAppStatus(appId, status) {
   if (app) {
     app.status = status;
     saveApplications();
-    showToast(`Aplicația a fost marcată ca "${status === 'approved' ? 'Aprobată' : 'Respinsă'}" de către Owner!`, 'success');
+    showToast(`Aplicația a fost marcată ca "${status === 'approved' ? 'Aprobată' : 'Respinsă'}"!`, 'success');
   }
 }
 
@@ -669,7 +832,6 @@ function ownerDeleteApp(appId) {
   showToast('Aplicație ștearsă din listă.', 'info');
 }
 
-// Render topics into respective categories
 function renderTopics(filteredList = null) {
   const listToRender = filteredList || currentTopics;
   const categories = ['anunturi', 'generale', 'ganguri', 'departamente', 'rapoarte', 'sugestii'];
@@ -692,7 +854,7 @@ function renderTopics(filteredList = null) {
       container.innerHTML = `
         <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;">
           <i class="fa-solid fa-inbox" style="font-size: 24px; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
-          Nu există discuții active în această categorie momentan. Fii primul care deschide un topic!
+          Nu există discuții active în această categorie momentan.
         </div>
       `;
       return;
@@ -700,9 +862,7 @@ function renderTopics(filteredList = null) {
 
     container.innerHTML = catTopics.map(topic => `
       <div class="topic-row" onclick="viewTopicDetail(${topic.id})">
-        <div class="topic-icon">
-          <i class="fa-solid ${getCategoryIcon(topic.category)}"></i>
-        </div>
+        <div class="topic-icon"><i class="fa-solid ${getCategoryIcon(topic.category)}"></i></div>
         <div class="topic-details">
           <h4>
             ${topic.pinned ? '<span class="badge-pinned"><i class="fa-solid fa-thumbtack"></i> PINNED</span>' : ''}
@@ -715,10 +875,7 @@ function renderTopics(filteredList = null) {
           </div>
         </div>
         <div class="topic-stats">
-          <div class="topic-stat-box">
-            <strong>${topic.replies ? topic.replies.length : 0}</strong>
-            <small>Răspunsuri</small>
-          </div>
+          <div class="topic-stat-box"><strong>${topic.replies ? topic.replies.length : 0}</strong><small>Răspunsuri</small></div>
           <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 12px;"></i>
         </div>
       </div>
@@ -740,7 +897,6 @@ function getCategoryIcon(cat) {
   }
 }
 
-// Category Pill Filter
 function selectCategory(category, buttonEl) {
   currentCategoryFilter = category;
   document.querySelectorAll('.category-pills .pill').forEach(btn => btn.classList.remove('active'));
@@ -748,7 +904,6 @@ function selectCategory(category, buttonEl) {
   filterTopics();
 }
 
-// Search Filter
 function filterTopics() {
   const query = document.getElementById('forumSearch').value.toLowerCase().trim();
   let filtered = currentTopics;
@@ -768,7 +923,6 @@ function filterTopics() {
   renderTopics(filtered);
 }
 
-// View switcher
 function switchView(viewName) {
   document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active-view'));
   document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
@@ -799,7 +953,6 @@ function switchView(viewName) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Modal Handlers
 function openModal(id) {
   const modal = document.getElementById(id);
   if (modal) modal.classList.add('active-modal');
@@ -817,16 +970,6 @@ function openNewPostModal(preselectedCategory = null) {
   openModal('newPostModal');
 }
 
-function openLoginModal() {
-  if (currentUser) {
-    renderProfileView();
-    switchView('profile');
-  } else {
-    openModal('loginModal');
-  }
-}
-
-// View Topic Detail
 function viewTopicDetail(id) {
   const topic = currentTopics.find(t => t.id === id);
   if (!topic) return;
@@ -875,7 +1018,6 @@ function renderModalReplies(replies) {
   `).join('');
 }
 
-// Owner actions on current topic
 function ownerTogglePinCurrentTopic() {
   if (!currentViewingTopicId || !currentUser || currentUser.role !== 'owner') return;
   const topic = currentTopics.find(t => t.id === currentViewingTopicId);
@@ -898,7 +1040,6 @@ function ownerDeleteCurrentTopic() {
   showToast('👑 Topicul a fost ȘTERS de către conducere!', 'success');
 }
 
-// Add reply
 function handleAddReply(e) {
   e.preventDefault();
   const authorInput = document.getElementById('replyAuthor');
@@ -921,13 +1062,12 @@ function handleAddReply(e) {
     saveTopics();
     renderModalReplies(topic.replies);
     contentInput.value = '';
-    showToast('Răspunsul tău a fost publicat cu succes!', 'success');
+    showToast('Răspunsul tău a fost publicat!', 'success');
     renderTopics();
     if (currentUser) renderProfileView();
   }
 }
 
-// Create new topic
 function handleCreateTopic(e) {
   e.preventDefault();
   const title = document.getElementById('topicTitle').value.trim();
@@ -961,7 +1101,6 @@ function handleCreateTopic(e) {
   if (currentUser) renderProfileView();
 }
 
-// Apply Form Modal
 function openApplyForm(type) {
   document.getElementById('applyType').value = type;
   document.getElementById('applyModalTitle').innerText = `Aplicație: ${type}`;
@@ -993,10 +1132,9 @@ function handleApplicationSubmit(e) {
   closeModal('applyModal');
   document.getElementById('submitApplicationForm').reset();
 
-  showToast(`Aplicația pentru "${type}" a fost trimisă cu succes către conducerea BandoPlug!`, 'success');
+  showToast(`Aplicația pentru "${type}" a fost trimisă către conducere!`, 'success');
 }
 
-// Owner controls
 function adminUpdatePlayers() {
   const count = document.getElementById('adminPlayerCountInput').value.trim();
   if (!count) return;
@@ -1015,16 +1153,6 @@ function adminUpdateAlert() {
   showToast('Mesajul de alertă din bara superioară a fost actualizat!', 'success');
 }
 
-function adminResetForumDefault() {
-  if (confirm('Ești sigur că vrei să resetezi forumul la postările implicite?')) {
-    currentTopics = [...INITIAL_TOPICS];
-    saveTopics();
-    renderTopics();
-    showToast('Forumul a fost resetat la valorile inițiale.', 'info');
-  }
-}
-
-// Toast notification
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
@@ -1042,7 +1170,6 @@ function showToast(message, type = 'info') {
   }, 4000);
 }
 
-// Update stats numbers
 function updateStats() {
   const totalTopics = currentTopics.length;
   const topicsStatEl = document.getElementById('statTopics');
@@ -1056,13 +1183,12 @@ function refreshServerStats() {
   showToast('Statistici server actualizate cu succes!', 'success');
 }
 
-// Setup general event listeners
 function setupEventListeners() {
   const copyBtn = document.getElementById('copyIpBtn');
   if (copyBtn) {
     copyBtn.addEventListener('click', () => {
       navigator.clipboard.writeText('connect play.bandoplug.ro');
-      showToast('IP Server (connect play.bandoplug.ro) copiat în clipboard!', 'success');
+      showToast('IP Server copiat în clipboard!', 'success');
     });
   }
 

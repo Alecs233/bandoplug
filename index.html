@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BandoPlug | Comunitate & Forum Oficial FiveM Roleplay</title>
   <meta name="description" content="Comunitatea oficială BandoPlug - Server de FiveM Roleplay Românesc, Gang-uri, Departamente, Regulament și Forum de Discuții.">
-  <link rel="icon" type="image/png" href="assets/bandoplug.png">
+  <link rel="icon" type="image/png" href="bandoplug.png">
 
   <!-- Google Fonts & Font Awesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,11 +35,11 @@
     </div>
   </div>
 
-  <!-- Main Navigation -->
+  <!-- Main Navigation (XenForo Style) -->
   <header class="navbar-wrapper">
     <div class="container navbar">
       <a href="#" class="brand-logo" onclick="switchView('home')">
-        <img src="assets/bandoplug.png" onerror="this.onerror=null; this.src='bandoplug.png';" alt="BandoPlug Logo" class="nav-logo-img">
+        <img src="bandoplug.png" onerror="this.onerror=null; this.src='assets/bandoplug.png';" alt="BandoPlug Logo" class="nav-logo-img">
         <div class="brand-text">
           <span class="brand-title">BANDO<span>PLUG</span></span>
           <span class="brand-subtitle">COMMUNITY & FORUM</span>
@@ -56,13 +56,69 @@
         <a href="https://discord.gg/8cR9EA48US" target="_blank" class="nav-link discord-link"><i class="fa-brands fa-discord"></i> Discord</a>
       </nav>
 
+      <!-- Nav Auth Actions (Logged Out / Logged In) -->
       <div class="nav-actions">
-        <button class="btn btn-red-glow" onclick="openNewPostModal()">
+        
+        <!-- Logged Out State Buttons -->
+        <div id="authLoggedOutBtns" class="auth-btn-group">
+          <button class="btn btn-login-xf" onclick="openLoginModal()">
+            <i class="fa-solid fa-right-to-bracket"></i> Conectare
+          </button>
+          <button class="btn btn-register-xf" onclick="openRegisterModal()">
+            <i class="fa-solid fa-user-plus"></i> Înregistrare
+          </button>
+        </div>
+
+        <!-- Logged In State User Dropdown Trigger -->
+        <div id="authLoggedInUser" class="user-nav-dropdown-wrapper" style="display: none;">
+          <div class="user-nav-pill" onclick="toggleUserDropdown(event)">
+            <img id="navUserAvatar" src="bandoplug.png" alt="Avatar" class="nav-user-img">
+            <span id="navUserName" class="nav-user-text">Seek</span>
+            <i class="fa-solid fa-chevron-down nav-dropdown-arrow"></i>
+          </div>
+
+          <!-- XenForo Style User Dropdown Menu -->
+          <div class="xf-dropdown-menu" id="userDropdownMenu">
+            <div class="xf-dropdown-header" onclick="switchView('profile'); closeUserDropdown();">
+              <img id="dropdownAvatarImg" src="bandoplug.png" alt="Avatar" class="dropdown-avatar-img">
+              <div class="dropdown-user-details">
+                <h4 id="dropdownName">Seek</h4>
+                <span id="dropdownRoleBadge" class="role-badge badge-owner">FOUNDER & OWNER</span>
+                <p id="dropdownTag" class="text-muted"><i class="fa-brands fa-discord text-blurple"></i> @seekmao</p>
+              </div>
+            </div>
+
+            <div class="dropdown-stats-row">
+              <div><small>Mesaje:</small> <strong id="dropdownMsgCount">0</strong></div>
+              <div><small>Reacții:</small> <strong id="dropdownReactionCount">12</strong></div>
+              <div><small>Puncte:</small> <strong id="dropdownPointsCount">50</strong></div>
+            </div>
+
+            <div class="dropdown-links-list">
+              <a href="javascript:void(0)" onclick="switchView('profile'); closeUserDropdown();">
+                <i class="fa-solid fa-id-card-clip"></i> Profilul Meu
+              </a>
+              <a href="javascript:void(0)" id="dropdownAdminLink" style="display:none;" onclick="switchView('admin'); closeUserDropdown();">
+                <i class="fa-solid fa-crown text-gold"></i> Panou de Control Owner
+              </a>
+              <a href="javascript:void(0)" onclick="openAvatarModal(); closeUserDropdown();">
+                <i class="fa-solid fa-camera"></i> Schimbă Poza de Profil
+              </a>
+              <a href="javascript:void(0)" onclick="openEditBioModal(); closeUserDropdown();">
+                <i class="fa-solid fa-pen-to-square"></i> Editează Detalii Cont
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="javascript:void(0)" class="text-red" onclick="handleLogout(); closeUserDropdown();">
+                <i class="fa-solid fa-right-from-bracket"></i> Deconectare
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-red-glow btn-create-post-top" onclick="openNewPostModal()">
           <i class="fa-solid fa-plus"></i> Creează Topic
         </button>
-        <button class="btn btn-discord" onclick="openLoginModal()">
-          <i class="fa-brands fa-discord"></i> <span id="userBtnLabel">Conectare</span>
-        </button>
+
         <button class="mobile-toggle" id="mobileToggle" aria-label="Deschide meniul">
           <i class="fa-solid fa-bars"></i>
         </button>
@@ -137,7 +193,7 @@
       <div class="hero-visual">
         <div class="logo-showcase-card">
           <div class="logo-glow-ring"></div>
-          <img src="assets/bandoplug.png" onerror="this.onerror=null; this.src='bandoplug.png';" alt="BandoPlug Official" class="hero-logo-img">
+          <img src="bandoplug.png" onerror="this.onerror=null; this.src='assets/bandoplug.png';" alt="BandoPlug Official" class="hero-logo-img">
           <div class="logo-tag">BANDO PLUG RP</div>
         </div>
       </div>
@@ -266,7 +322,7 @@
             </div>
             <div class="discord-widget-body">
               <div class="discord-brand-box">
-                <img src="assets/bandoplug.png" onerror="this.onerror=null; this.src='bandoplug.png';" alt="BandoPlug Server" class="discord-avatar">
+                <img src="bandoplug.png" onerror="this.onerror=null; this.src='assets/bandoplug.png';" alt="BandoPlug Server" class="discord-avatar">
                 <div class="discord-meta">
                   <h4>BandoPlug RP România</h4>
                   <p><span class="online-dot"></span> <strong>1,240 Online</strong> &bull; 3,420 Membri</p>
@@ -414,8 +470,6 @@
       </div>
 
       <div class="rules-container">
-        
-        <!-- Regula 1: Termeni de Bază -->
         <div class="rule-card">
           <div class="rule-card-header">
             <span class="rule-number">01</span>
@@ -424,14 +478,13 @@
           <div class="rule-body">
             <ul>
               <li><strong>In Character (IC):</strong> Tot ce ține de universul jocului și acțiunile personajului tău.</li>
-              <li><strong>Out of Character (OOC):</strong> Tot ce ține de tine ca persoană din viața reală. Nu amestecați informațiile OOC cu cele IC.</li>
-              <li><strong>Fail RP:</strong> Efectuarea unor acțiuni nerealiste sau neconforme cu un caracter uman într-o societate reală. (Sancțiune: Warn / Ban temporar).</li>
-              <li><strong>Fear RP:</strong> Sunteți obligat să vă prețuiți viața personajului când sunteți amenințat cu o armă sau vă aflați în inferioritate numerică netă.</li>
+              <li><strong>Out of Character (OOC):</strong> Tot ce ține de tine ca persoană din viața reală.</li>
+              <li><strong>Fail RP:</strong> Efectuarea unor acțiuni nerealiste sau neconforme cu un caracter uman într-o societate reală.</li>
+              <li><strong>Fear RP:</strong> Sunteți obligat să vă prețuiți viața personajului când sunteți amenințat cu o armă.</li>
             </ul>
           </div>
         </div>
 
-        <!-- Regula 2: Combat & Sancțiuni Grave -->
         <div class="rule-card">
           <div class="rule-card-header">
             <span class="rule-number">02</span>
@@ -441,42 +494,11 @@
             <ul>
               <li><strong>RDM (Random Deathmatch):</strong> Uciderea sau atacarea unui alt jucător fără un motiv bine întemeiat de Roleplay este strict INTERZISĂ.</li>
               <li><strong>VDM (Vehicle Deathmatch):</strong> Folosirea unui vehicul drept armă pentru a călca intenționat alți jucători este strict interzisă.</li>
-              <li><strong>NLR (New Life Rule):</strong> Dacă caracterul tău moare și primește respawn la spital, uiți complet acțiunea anterioară și nu ai voie să te reîntorci la locație timp de 30 de minute.</li>
-              <li><strong>MetaGaming (MG):</strong> Folosirea informațiilor aflate pe Discord, Twitch sau forum în joc pentru un avantaj IC.</li>
-              <li><strong>PowerGaming (PG):</strong> Forțarea unui alt jucător într-o acțiune fără a-i da șansa de a reacționa, sau realizarea unor acțiuni supraomenești.</li>
+              <li><strong>NLR (New Life Rule):</strong> Dacă caracterul tău moare și primește respawn la spital, uiți complet acțiunea anterioară.</li>
+              <li><strong>MetaGaming (MG) & PowerGaming (PG):</strong> Strict sancționate conform regulamentului serverului.</li>
             </ul>
           </div>
         </div>
-
-        <!-- Regula 3: Ilegale & Gang-uri -->
-        <div class="rule-card">
-          <div class="rule-card-header">
-            <span class="rule-number">03</span>
-            <h3>Regulament Gang-uri, Carteluri & Jafuri</h3>
-          </div>
-          <div class="rule-body">
-            <ul>
-              <li>Orice gang oficial BandoPlug trebuie să aibă minim 5 membri activi și o aplicație aprobată pe forum.</li>
-              <li>Jafurile la bănci mari și magazine necesită negociator din partea Poliției și respectarea numărului maxim de ostatici.</li>
-              <li>Turf Wars (războaiele de teritoriu) se desfășoară exclusiv în zonele desemnate pe hartă conform orarului din Discord.</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Regula 4: Comportament Comunitar -->
-        <div class="rule-card">
-          <div class="rule-card-header">
-            <span class="rule-number">04</span>
-            <h3>Conduită Comunitară & Respect</h3>
-          </div>
-          <div class="rule-body">
-            <ul>
-              <li>Rasismul, discriminarea de orice fel, doxxing-ul, limbajul vulgar extrem OOC sau promovarea altor servere duc la <strong>BAN PERMANENT</strong> fără drept de apel.</li>
-              <li>Folosirea oricărui tip de hack, mod meniu, crosshair extern, exploit sau abuz de bug se sancționează cu <strong>BAN PERMANENT</strong> + Blacklist.</li>
-            </ul>
-          </div>
-        </div>
-
       </div>
     </div>
 
@@ -497,11 +519,6 @@
           <div class="apply-card-icon"><i class="fa-solid fa-user-shield text-red"></i></div>
           <h3>Aplicație Echipa Staff</h3>
           <p>Devino Helper / Moderator pe serverul BandoPlug și ajută la menținerea unui Roleplay de calitate.</p>
-          <ul class="apply-reqs">
-            <li><i class="fa-solid fa-check text-red"></i> Minim 16 ani împliniți</li>
-            <li><i class="fa-solid fa-check text-red"></i> Cunoașterea perfectă a regulamentului</li>
-            <li><i class="fa-solid fa-check text-red"></i> Microfon clar & disponibilitate pe Discord</li>
-          </ul>
           <button class="btn btn-red-glow btn-block" onclick="openApplyForm('Staff / Helper')">Aplică la Staff</button>
         </div>
 
@@ -509,35 +526,20 @@
           <div class="apply-card-icon"><i class="fa-solid fa-building-shield text-blue"></i></div>
           <h3>Aplicație LSPD (Poliție)</h3>
           <p>Alătură-te departamentului de poliție din Los Santos. Patrulează străzile și menține ordinea publică.</p>
-          <ul class="apply-reqs">
-            <li><i class="fa-solid fa-check text-blue"></i> Minim 15 ani</li>
-            <li><i class="fa-solid fa-check text-blue"></i> Fără antecedente penale recente IC</li>
-            <li><i class="fa-solid fa-check text-blue"></i> Abilități bune de conducere & comunicare radio</li>
-          </ul>
           <button class="btn btn-blue btn-block" onclick="openApplyForm('LSPD - Poliție')">Aplică la LSPD</button>
         </div>
 
         <div class="apply-card">
           <div class="apply-card-icon"><i class="fa-solid fa-truck-medical text-green"></i></div>
-          <h3>Aplicație EMS (Medici & Salvare)</h3>
+          <h3>Aplicație EMS (Medici)</h3>
           <p>Salvează viețile cetățenilor răniți și asigură primul ajutor în situații de urgență maximă.</p>
-          <ul class="apply-reqs">
-            <li><i class="fa-solid fa-check text-green"></i> Minim 14 ani</li>
-            <li><i class="fa-solid fa-check text-green"></i> Comportament exemplar și răbdare</li>
-            <li><i class="fa-solid fa-check text-green"></i> Seriozitate în apelurile de urgență</li>
-          </ul>
           <button class="btn btn-green btn-block" onclick="openApplyForm('EMS - Medici')">Aplică la EMS</button>
         </div>
 
         <div class="apply-card">
           <div class="apply-card-icon"><i class="fa-solid fa-skull-crossbones text-red"></i></div>
-          <h3>Înregistrare Gang / Mafie Oficială</h3>
+          <h3>Înregistrare Gang Oficial</h3>
           <p>Ai o grupare organizată? Aplică pentru a primi statut de Gang Oficial, teritoriu și arme.</p>
-          <ul class="apply-reqs">
-            <li><i class="fa-solid fa-check text-red"></i> Minim 5 membri activi</li>
-            <li><i class="fa-solid fa-check text-red"></i> Lore și poveste bine structurată</li>
-            <li><i class="fa-solid fa-check text-red"></i> Lider matur cu experiență de Roleplay</li>
-          </ul>
           <button class="btn btn-red-glow btn-block" onclick="openApplyForm('Gang Oficial')">Înregistrează Gang</button>
         </div>
       </div>
@@ -571,30 +573,6 @@
             <div><small>Uptime:</small> <strong>99.9% (7d 14h)</strong></div>
           </div>
         </div>
-
-        <div class="status-box online-box">
-          <div class="status-box-header">
-            <h4>Discord Bot & Voice Gateway</h4>
-            <span class="status-pill online">ONLINE</span>
-          </div>
-          <div class="status-box-metrics">
-            <div><small>Stare Bot:</small> <strong>Operațional</strong></div>
-            <div><small>Tichete Active:</small> <strong>8</strong></div>
-            <div><small>Sistem Loguri:</small> <strong>Conectat</strong></div>
-          </div>
-        </div>
-
-        <div class="status-box online-box">
-          <div class="status-box-header">
-            <h4>Baza de Date & Sync In-Game</h4>
-            <span class="status-pill online">ONLINE</span>
-          </div>
-          <div class="status-box-metrics">
-            <div><small>MySQL Cluster:</small> <strong>1.2ms latență</strong></div>
-            <div><small>Salvare Automată:</small> <strong>La fiecare 30 secunde</strong></div>
-            <div><small>Anti-DDoS:</small> <strong>Activ (Layer 7 Filter)</strong></div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -618,16 +596,13 @@
         </div>
       </div>
 
-      <!-- Owner Stats Dashboard -->
       <div class="admin-grid">
         <div class="admin-card">
           <div class="admin-card-header">
             <h3><i class="fa-solid fa-file-signature text-red"></i> Aplicații Primite de la Jucători (<span id="adminAppsCount">0</span>)</h3>
             <span class="badge-count">Recrutări</span>
           </div>
-          <div class="admin-apps-list" id="adminApplicationsList">
-            <!-- Dynamic Applications from localStorage -->
-          </div>
+          <div class="admin-apps-list" id="adminApplicationsList"></div>
         </div>
 
         <div class="admin-card">
@@ -650,32 +625,30 @@
                 <button class="btn btn-red-glow" onclick="adminUpdateAlert()">Trimite</button>
               </div>
             </div>
-
-            <div class="control-box" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
-              <label>Moderare & Curățare Forum:</label>
-              <p class="text-muted" style="font-size: 12px; margin-bottom: 10px;">Ca Owner, poți șterge sau fixa (PIN) orice topic direct dând click pe el pe forum.</p>
-              <button class="btn btn-secondary" onclick="adminResetForumDefault()">
-                <i class="fa-solid fa-arrows-rotate"></i> Resetează Forum la Valorile Implicite
-              </button>
-            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- VIEW 6: PROFIL UTILIZATOR & MESAJELE MELE -->
+    <!-- VIEW 6: PROFIL XENFORO STYLE -->
     <div id="view-profile" class="app-view">
       <div class="profile-card-wrapper">
         <div class="profile-banner">
           <div class="profile-banner-overlay"></div>
-          <button class="btn btn-secondary profile-edit-btn" onclick="openAvatarModal()">
-            <i class="fa-solid fa-camera"></i> Schimbă Poza de Profil
-          </button>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary profile-edit-btn" onclick="openAvatarModal()">
+              <i class="fa-solid fa-camera"></i> Schimbă Poza
+            </button>
+            <button class="btn btn-secondary profile-edit-btn" onclick="openEditBioModal()">
+              <i class="fa-solid fa-pen"></i> Editează Profil
+            </button>
+          </div>
         </div>
 
         <div class="profile-header-content">
-          <div class="profile-avatar-container">
+          <div class="profile-avatar-container" onclick="openAvatarModal()" title="Schimbă poza de profil">
             <img id="profileAvatarImg" src="bandoplug.png" alt="Avatar Profil" class="profile-avatar-img">
+            <div class="avatar-hover-cam"><i class="fa-solid fa-camera"></i></div>
             <span class="profile-online-badge"></span>
           </div>
           
@@ -685,59 +658,77 @@
               <span id="profileRoleBadge" class="role-badge badge-owner">FOUNDER & OWNER</span>
             </div>
             <p class="profile-discord-tag" id="profileDiscordTag"><i class="fa-brands fa-discord text-blurple"></i> @seekmao</p>
-            <p class="profile-bio-text" id="profileBio">Membru activ pe comunitatea oficială BandoPlug FiveM Roleplay.</p>
+            <p class="profile-email-meta" id="profileEmailMeta"><i class="fa-regular fa-envelope"></i> email@verificat.com</p>
+            <p class="profile-bio-text" id="profileBio">Fondator & Conducere Oficială BandoPlug FiveM Roleplay.</p>
           </div>
 
           <div class="profile-action-btns">
-            <button class="btn btn-secondary" onclick="openEditBioModal()">
-              <i class="fa-solid fa-pen"></i> Editează Bio
+            <button class="btn btn-secondary" onclick="switchView('forum')">
+              <i class="fa-solid fa-comments"></i> Forum
             </button>
             <button class="btn btn-red-glow" onclick="handleLogout()">
-              <i class="fa-solid fa-right-from-bracket"></i> Deconectare
+              <i class="fa-solid fa-right-from-bracket"></i> Ieșire
             </button>
           </div>
         </div>
 
-        <!-- Profile Stats Strip -->
+        <!-- Profile Stats Strip (XenForo Style) -->
         <div class="profile-stats-strip">
           <div class="profile-stat-box">
             <strong id="profileStatTopics">0</strong>
-            <span>Topicuri Create</span>
+            <span>Mesaje & Topicuri</span>
           </div>
           <div class="profile-stat-box">
-            <strong id="profileStatReplies">0</strong>
-            <span>Răspunsuri Trimise</span>
+            <strong id="profileStatReactions">18</strong>
+            <span>Scor Reacții</span>
           </div>
           <div class="profile-stat-box">
-            <strong id="profileStatApps">0</strong>
-            <span>Aplicații Trimise</span>
+            <strong id="profileStatPoints">65</strong>
+            <span>Puncte Trofeu</span>
           </div>
           <div class="profile-stat-box">
-            <strong id="profileStatRank">VIP Supporter</strong>
-            <span>Statut Comunitar</span>
+            <strong id="profileStatJoined">Azi</strong>
+            <span>Membru Din</span>
           </div>
         </div>
 
         <!-- Profile Activity Tabs -->
         <div class="profile-activity-section">
+          
+          <!-- Status Update Box -->
+          <div class="profile-status-update-box">
+            <img id="statusBoxAvatar" src="bandoplug.png" alt="Avatar" class="status-avatar-mini">
+            <input type="text" id="profileStatusInput" placeholder="Actualizează-ți statusul pe profil (ex: În patrulă LSPD / Pe server)..." onkeydown="if(event.key==='Enter') handlePostProfileStatus()">
+            <button class="btn btn-red-glow" style="padding: 8px 16px;" onclick="handlePostProfileStatus()">Postează</button>
+          </div>
+
           <div class="profile-tabs">
             <button class="profile-tab-btn active" id="tabMyTopicsBtn" onclick="switchProfileTab('topics')">
-              <i class="fa-solid fa-file-lines"></i> Topicurile Mele
+              <i class="fa-solid fa-file-lines"></i> Topicurile Mele pe Forum
             </button>
             <button class="profile-tab-btn" id="tabMyRepliesBtn" onclick="switchProfileTab('replies')">
-              <i class="fa-solid fa-comments"></i> Răspunsurile & Mesajele Mele
+              <i class="fa-solid fa-comments"></i> Răspunsurile Mele
+            </button>
+            <button class="profile-tab-btn" id="tabMyAboutBtn" onclick="switchProfileTab('about')">
+              <i class="fa-solid fa-circle-info"></i> Despre & Contact Discord
             </button>
           </div>
 
           <div id="paneMyTopics" class="profile-pane active">
-            <div class="topics-list" id="myTopicsListContainer">
-              <!-- Dynamically rendered user topics -->
-            </div>
+            <div class="topics-list" id="myTopicsListContainer"></div>
           </div>
 
           <div id="paneMyReplies" class="profile-pane">
-            <div class="replies-list" id="myRepliesListContainer">
-              <!-- Dynamically rendered user replies -->
+            <div class="replies-list" id="myRepliesListContainer"></div>
+          </div>
+
+          <div id="paneMyAbout" class="profile-pane">
+            <div class="about-card-info" id="myAboutContainer">
+              <div class="about-row"><strong>Nume Utilizator:</strong> <span id="aboutUsername">Seek</span></div>
+              <div class="about-row"><strong>Tag Discord:</strong> <span id="aboutDiscord">@seekmao</span></div>
+              <div class="about-row"><strong>Adresă Email:</strong> <span id="aboutEmail">seek@bandoplug.ro</span></div>
+              <div class="about-row"><strong>Rol Comunitar:</strong> <span id="aboutRole" class="text-gold">Founder & Owner</span></div>
+              <div class="about-row"><strong>Stare Cont:</strong> <span class="text-green"><i class="fa-solid fa-circle-check"></i> Activat & Verificat</span></div>
             </div>
           </div>
         </div>
@@ -745,6 +736,173 @@
     </div>
 
   </main>
+
+  <!-- MODAL: Înregistrare XenForo Style -->
+  <div class="modal-overlay" id="registerModal">
+    <div class="modal-card modal-xf-register">
+      <div class="modal-header">
+        <h3 class="modal-xf-title">Register</h3>
+        <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
+      </div>
+
+      <!-- Quick Discord Register Strip -->
+      <div class="xf-form-row xf-fast-auth">
+        <div class="xf-label">Register faster using:</div>
+        <div class="xf-field">
+          <button type="button" class="btn btn-discord btn-xf-discord" onclick="handleFastDiscordRegister()">
+            <i class="fa-brands fa-discord"></i> Discord
+          </button>
+        </div>
+      </div>
+
+      <div class="xf-divider-line"></div>
+
+      <form id="xfRegisterForm" onsubmit="handleXenForoRegister(event)">
+        
+        <div class="xf-form-row">
+          <div class="xf-label">
+            <label for="regXfUsername">Username:</label>
+            <small class="text-muted">Required</small>
+          </div>
+          <div class="xf-field">
+            <input type="text" id="regXfUsername" required placeholder="ex: Alecs233 sau seekmao">
+            <div class="xf-help-text">This is the name that will be shown with your messages. You may use any name you wish.</div>
+          </div>
+        </div>
+
+        <div class="xf-form-row">
+          <div class="xf-label">
+            <label for="regXfEmail">Email:</label>
+            <small class="text-muted">Required</small>
+          </div>
+          <div class="xf-field">
+            <input type="email" id="regXfEmail" required placeholder="ex: alexmarius831321@gmail.com">
+          </div>
+        </div>
+
+        <div class="xf-form-row">
+          <div class="xf-label">
+            <label for="regXfPassword">Password:</label>
+            <small class="text-muted">Required</small>
+          </div>
+          <div class="xf-field">
+            <div class="xf-password-wrap">
+              <input type="password" id="regXfPassword" required placeholder="Parolă securizată...">
+              <button type="button" class="btn-xf-toggle-pass" onclick="togglePassVisibility('regXfPassword', this)">
+                <i class="fa-regular fa-eye"></i> Show
+              </button>
+            </div>
+            <div class="xf-help-text">Entering a password is required.</div>
+          </div>
+        </div>
+
+        <div class="xf-form-row">
+          <div class="xf-label">
+            <label>Verification:</label>
+            <small class="text-muted">Required</small>
+          </div>
+          <div class="xf-field">
+            <div class="xf-hcaptcha-box">
+              <label class="hcaptcha-checkbox-label">
+                <input type="checkbox" id="hCaptchaCheck" required>
+                <span class="custom-checkbox"></span>
+                <span>Eu sunt om</span>
+              </label>
+              <div class="hcaptcha-branding">
+                <i class="fa-solid fa-hand-holding-hand text-blue"></i>
+                <div><strong>hCaptcha</strong><br><small>Confidențialitate - Termeni</small></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="xf-form-row">
+          <div class="xf-label"></div>
+          <div class="xf-field">
+            <label class="xf-terms-checkbox">
+              <input type="checkbox" id="termsCheck" required checked>
+              <span>I agree to the <strong>terms</strong> and <strong>privacy policy</strong>.</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer justify-start">
+          <button type="submit" class="btn btn-green btn-xf-submit">
+            <i class="fa-solid fa-user-plus"></i> Register
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal('registerModal'); openLoginModal();">
+            Ai deja cont? Conectare
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Conectare XenForo Style -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-card modal-xf-register">
+      <div class="modal-header">
+        <h3 class="modal-xf-title">Log in</h3>
+        <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+      </div>
+
+      <!-- Quick Discord Login Strip -->
+      <div class="xf-form-row xf-fast-auth">
+        <div class="xf-label">Log in faster using:</div>
+        <div class="xf-field">
+          <button type="button" class="btn btn-discord btn-xf-discord" onclick="handleFastDiscordRegister()">
+            <i class="fa-brands fa-discord"></i> Discord
+          </button>
+        </div>
+      </div>
+
+      <div class="xf-divider-line"></div>
+
+      <form id="xfLoginForm" onsubmit="handleXenForoLogin(event)">
+        <div class="xf-form-row">
+          <div class="xf-label">
+            <label for="loginXfUser">Your name or email address:</label>
+          </div>
+          <div class="xf-field">
+            <input type="text" id="loginXfUser" required placeholder="ex: Alecs233 sau seekmao sau alex@gmail.com">
+          </div>
+        </div>
+
+        <div class="xf-form-row">
+          <div class="xf-label">
+            <label for="loginXfPass">Password:</label>
+          </div>
+          <div class="xf-field">
+            <div class="xf-password-wrap">
+              <input type="password" id="loginXfPass" required placeholder="Parolă...">
+              <button type="button" class="btn-xf-toggle-pass" onclick="togglePassVisibility('loginXfPass', this)">
+                <i class="fa-regular fa-eye"></i> Show
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="xf-form-row">
+          <div class="xf-label"></div>
+          <div class="xf-field">
+            <label class="xf-terms-checkbox">
+              <input type="checkbox" id="rememberCheck" checked>
+              <span>Stay logged in</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer justify-start">
+          <button type="submit" class="btn btn-green btn-xf-submit">
+            <i class="fa-solid fa-right-to-bracket"></i> Log in
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal('loginModal'); openRegisterModal();">
+            Nu ai cont? Register
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- MODAL: Creează Topic Nou -->
   <div class="modal-overlay" id="newPostModal">
@@ -833,9 +991,7 @@
         <!-- Replies Section -->
         <div class="replies-section">
           <h3><i class="fa-solid fa-reply text-red"></i> Răspunsuri (<span id="replyCount">0</span>)</h3>
-          <div class="replies-list" id="modalRepliesList">
-            <!-- Rendered dynamic replies -->
-          </div>
+          <div class="replies-list" id="modalRepliesList"></div>
 
           <!-- Add reply form -->
           <form class="add-reply-form" id="replyForm" onsubmit="handleAddReply(event)">
@@ -889,62 +1045,6 @@
     </div>
   </div>
 
-  <!-- MODAL: Autentificare & Înregistrare Securizată -->
-  <div class="modal-overlay" id="loginModal">
-    <div class="modal-card modal-small text-center">
-      <div class="modal-header justify-center">
-        <img src="bandoplug.png" onerror="this.onerror=null; this.src='assets/bandoplug.png';" alt="BandoPlug" style="width: 75px; margin: 0 auto 10px;">
-        <h3>Cont BandoPlug</h3>
-        <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
-      </div>
-      
-      <!-- Auth Switcher -->
-      <div class="auth-tabs">
-        <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')"><i class="fa-solid fa-right-to-bracket"></i> Conectare</button>
-        <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')"><i class="fa-solid fa-user-plus"></i> Înregistrare</button>
-      </div>
-
-      <!-- Tab 1: Conectare (Login) -->
-      <form id="authLoginPane" class="auth-pane active" onsubmit="handleAccountLogin(event)">
-        <p class="text-muted" style="margin: 12px 0 16px; font-size: 13px;">
-          Introdu numele tău de Discord și parola pentru a te autentifica pe forum.
-        </p>
-        <div class="form-group text-left" style="text-align: left;">
-          <label>Nume Discord / Username *</label>
-          <input type="text" id="loginDiscordUser" required placeholder="ex: seekmao sau alex_plug">
-        </div>
-        <div class="form-group text-left" style="text-align: left;">
-          <label>Parolă *</label>
-          <input type="password" id="loginPassword" required placeholder="Introdu parola ta...">
-        </div>
-        <button type="submit" class="btn btn-red-glow btn-block" style="padding: 12px; font-size: 1rem; margin-top: 8px;">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i> Intră în Cont
-        </button>
-        <p style="font-size: 12px; color: var(--text-muted); margin-top: 14px;">
-          Nu ai încă un cont? <a href="javascript:void(0)" onclick="switchAuthTab('register')" class="text-red">Creează cont aici</a>
-        </p>
-      </form>
-
-      <!-- Tab 2: Înregistrare (Register) -->
-      <form id="authRegisterPane" class="auth-pane" onsubmit="handleAccountRegister(event)">
-        <p class="text-muted" style="margin: 12px 0 16px; font-size: 13px;">
-          Setează-ți contul și protejează-ți numele de Discord împotriva furtului de identitate.
-        </p>
-        <div class="form-group text-left" style="text-align: left;">
-          <label>Nume Discord (Tag / Username) *</label>
-          <input type="text" id="regDiscordUser" required placeholder="ex: seekmao sau alex_plug">
-        </div>
-        <div class="form-group text-left" style="text-align: left;">
-          <label>Alege o Parolă Sigură *</label>
-          <input type="password" id="regPassword" required placeholder="Minim 4 caractere">
-        </div>
-        <button type="submit" class="btn btn-discord-block" style="padding: 12px; font-size: 1rem; margin-top: 8px;">
-          <i class="fa-solid fa-shield-check"></i> Înregistrează Contul
-        </button>
-      </form>
-    </div>
-  </div>
-
   <!-- MODAL: Schimbă Avatar & Poza Profil -->
   <div class="modal-overlay" id="avatarModal">
     <div class="modal-card modal-small">
@@ -980,13 +1080,13 @@
   <div class="modal-overlay" id="editBioModal">
     <div class="modal-card modal-small">
       <div class="modal-header">
-        <h3><i class="fa-solid fa-pen text-red"></i> Editează Bio Profil</h3>
+        <h3><i class="fa-solid fa-pen text-red"></i> Editează Detalii Profil</h3>
         <button class="modal-close" onclick="closeModal('editBioModal')">&times;</button>
       </div>
       <form onsubmit="handleSaveBio(event)">
         <div class="form-group">
-          <label>Nume Afișat (Roleplay / Discord)</label>
-          <input type="text" id="editDisplayNameInput" required placeholder="ex: Marcus Vance">
+          <label>Nume Afișat</label>
+          <input type="text" id="editDisplayNameInput" required placeholder="ex: Alecs233 sau Seek">
         </div>
         <div class="form-group">
           <label>Descriere / Bio Personal</label>
