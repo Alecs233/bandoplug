@@ -663,6 +663,87 @@
       </div>
     </div>
 
+    <!-- VIEW 6: PROFIL UTILIZATOR & MESAJELE MELE -->
+    <div id="view-profile" class="app-view">
+      <div class="profile-card-wrapper">
+        <div class="profile-banner">
+          <div class="profile-banner-overlay"></div>
+          <button class="btn btn-secondary profile-edit-btn" onclick="openAvatarModal()">
+            <i class="fa-solid fa-camera"></i> Schimbă Poza de Profil
+          </button>
+        </div>
+
+        <div class="profile-header-content">
+          <div class="profile-avatar-container">
+            <img id="profileAvatarImg" src="bandoplug.png" alt="Avatar Profil" class="profile-avatar-img">
+            <span class="profile-online-badge"></span>
+          </div>
+          
+          <div class="profile-main-meta">
+            <div class="profile-name-row">
+              <h2 id="profileDisplayName">Seek</h2>
+              <span id="profileRoleBadge" class="role-badge badge-owner">FOUNDER & OWNER</span>
+            </div>
+            <p class="profile-discord-tag" id="profileDiscordTag"><i class="fa-brands fa-discord text-blurple"></i> @seekmao</p>
+            <p class="profile-bio-text" id="profileBio">Membru activ pe comunitatea oficială BandoPlug FiveM Roleplay.</p>
+          </div>
+
+          <div class="profile-action-btns">
+            <button class="btn btn-secondary" onclick="openEditBioModal()">
+              <i class="fa-solid fa-pen"></i> Editează Bio
+            </button>
+            <button class="btn btn-red-glow" onclick="handleLogout()">
+              <i class="fa-solid fa-right-from-bracket"></i> Deconectare
+            </button>
+          </div>
+        </div>
+
+        <!-- Profile Stats Strip -->
+        <div class="profile-stats-strip">
+          <div class="profile-stat-box">
+            <strong id="profileStatTopics">0</strong>
+            <span>Topicuri Create</span>
+          </div>
+          <div class="profile-stat-box">
+            <strong id="profileStatReplies">0</strong>
+            <span>Răspunsuri Trimise</span>
+          </div>
+          <div class="profile-stat-box">
+            <strong id="profileStatApps">0</strong>
+            <span>Aplicații Trimise</span>
+          </div>
+          <div class="profile-stat-box">
+            <strong id="profileStatRank">VIP Supporter</strong>
+            <span>Statut Comunitar</span>
+          </div>
+        </div>
+
+        <!-- Profile Activity Tabs -->
+        <div class="profile-activity-section">
+          <div class="profile-tabs">
+            <button class="profile-tab-btn active" id="tabMyTopicsBtn" onclick="switchProfileTab('topics')">
+              <i class="fa-solid fa-file-lines"></i> Topicurile Mele
+            </button>
+            <button class="profile-tab-btn" id="tabMyRepliesBtn" onclick="switchProfileTab('replies')">
+              <i class="fa-solid fa-comments"></i> Răspunsurile & Mesajele Mele
+            </button>
+          </div>
+
+          <div id="paneMyTopics" class="profile-pane active">
+            <div class="topics-list" id="myTopicsListContainer">
+              <!-- Dynamically rendered user topics -->
+            </div>
+          </div>
+
+          <div id="paneMyReplies" class="profile-pane">
+            <div class="replies-list" id="myRepliesListContainer">
+              <!-- Dynamically rendered user replies -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- MODAL: Creează Topic Nou -->
@@ -860,6 +941,61 @@
         <button type="submit" class="btn btn-discord-block" style="padding: 12px; font-size: 1rem; margin-top: 8px;">
           <i class="fa-solid fa-shield-check"></i> Înregistrează Contul
         </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Schimbă Avatar & Poza Profil -->
+  <div class="modal-overlay" id="avatarModal">
+    <div class="modal-card modal-small">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-image text-red"></i> Alege Poza de Profil</h3>
+        <button class="modal-close" onclick="closeModal('avatarModal')">&times;</button>
+      </div>
+      <div style="margin-bottom: 18px;">
+        <label style="font-size: 13px; color: var(--text-light-muted); display: block; margin-bottom: 8px;">1. Alege un Avatar Urban / FiveM:</label>
+        <div class="avatar-presets-grid" id="avatarPresetsGrid">
+          <img src="bandoplug.png" class="preset-avatar-img selected" onclick="selectPresetAvatar('bandoplug.png', this)">
+          <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=150&auto=format&fit=crop&q=80" class="preset-avatar-img" onclick="selectPresetAvatar(this.src, this)">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" class="preset-avatar-img" onclick="selectPresetAvatar(this.src, this)">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80" class="preset-avatar-img" onclick="selectPresetAvatar(this.src, this)">
+          <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80" class="preset-avatar-img" onclick="selectPresetAvatar(this.src, this)">
+          <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80" class="preset-avatar-img" onclick="selectPresetAvatar(this.src, this)">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>2. Sau introdu un Link către o poză proprie (URL):</label>
+        <input type="url" id="customAvatarUrlInput" placeholder="https://i.imgur.com/example.png">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('avatarModal')">Anulează</button>
+        <button type="button" class="btn btn-red-glow" onclick="saveNewAvatar()"><i class="fa-solid fa-check"></i> Salvează Poza</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Editare Bio & Descriere Profil -->
+  <div class="modal-overlay" id="editBioModal">
+    <div class="modal-card modal-small">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-pen text-red"></i> Editează Bio Profil</h3>
+        <button class="modal-close" onclick="closeModal('editBioModal')">&times;</button>
+      </div>
+      <form onsubmit="handleSaveBio(event)">
+        <div class="form-group">
+          <label>Nume Afișat (Roleplay / Discord)</label>
+          <input type="text" id="editDisplayNameInput" required placeholder="ex: Marcus Vance">
+        </div>
+        <div class="form-group">
+          <label>Descriere / Bio Personal</label>
+          <textarea id="editBioTextInput" rows="3" placeholder="Scrie ceva despre tine sau personajul tău..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('editBioModal')">Anulează</button>
+          <button type="submit" class="btn btn-red-glow"><i class="fa-solid fa-floppy-disk"></i> Salvează</button>
+        </div>
       </form>
     </div>
   </div>

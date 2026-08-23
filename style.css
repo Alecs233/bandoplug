@@ -1778,7 +1778,213 @@ a {
   margin-bottom: 6px;
 }
 
+/* ==========================================================================
+   Profile Card & Avatar Styling
+   ========================================================================== */
+.profile-card-wrapper {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.profile-banner {
+  height: 180px;
+  background: linear-gradient(135deg, #1c0a0e 0%, #300d14 50%, #0a0c10 100%);
+  position: relative;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: 16px;
+}
+
+.profile-header-content {
+  padding: 0 30px 24px;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: flex-end;
+  gap: 24px;
+  margin-top: -60px;
+}
+
+.profile-avatar-container {
+  position: relative;
+  width: 110px;
+  height: 110px;
+}
+
+.profile-avatar-img {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #000;
+  border: 3px solid var(--primary-red);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 15px var(--red-glow);
+}
+
+.profile-online-badge {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--green-accent);
+  border: 3px solid var(--bg-surface);
+}
+
+.profile-main-meta h2 {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.profile-discord-tag {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.profile-bio-text {
+  font-size: 13.5px;
+  color: var(--text-light-muted);
+  max-width: 600px;
+}
+
+.profile-action-btns {
+  display: flex;
+  gap: 10px;
+}
+
+.profile-stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--bg-card-alt);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px 30px;
+  gap: 16px;
+}
+
+.profile-stat-box {
+  text-align: center;
+}
+
+.profile-stat-box strong {
+  display: block;
+  font-size: 20px;
+  font-family: var(--font-heading);
+  color: #fff;
+}
+
+.profile-stat-box span {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-activity-section {
+  padding: 24px 30px 40px;
+}
+
+.profile-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+}
+
+.profile-tab-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.profile-tab-btn:hover {
+  color: #fff;
+}
+
+.profile-tab-btn.active {
+  background: rgba(255, 30, 56, 0.15);
+  color: var(--primary-red);
+  border: 1px solid rgba(255, 30, 56, 0.3);
+}
+
+.profile-pane {
+  display: none;
+}
+
+.profile-pane.active {
+  display: block;
+  animation: fadeIn 0.25s ease;
+}
+
+/* Avatar presets grid */
+.avatar-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.preset-avatar-img {
+  width: 100%;
+  height: 70px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.preset-avatar-img:hover {
+  border-color: var(--primary-red);
+  transform: scale(1.05);
+}
+
+.preset-avatar-img.selected {
+  border-color: var(--primary-red);
+  box-shadow: 0 0 12px var(--red-glow);
+}
+
 @media (max-width: 992px) {
+  .profile-header-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    justify-items: center;
+    margin-top: -50px;
+  }
+  .profile-name-row {
+    justify-content: center;
+  }
+  .profile-action-btns {
+    justify-content: center;
+  }
+  .profile-stats-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
   .admin-grid {
     grid-template-columns: 1fr;
   }
