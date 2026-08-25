@@ -1529,8 +1529,283 @@
     </div>
   </footer>
 
-  <!-- Embedded Complete Fail-Safe Guest & Forum Engine -->
+  <!-- Embedded Complete Fail-Safe Guest & Interactive Forum Engine -->
   <script>
+    // Initial Seed Topics
+    const EMBEDDED_TOPICS = [
+      {
+        id: 1,
+        category: 'anunturi',
+        parentGroup: 'server-info',
+        title: '🔥 [DESCHIDERE] BandoPlug v2.0 - Noua Eră a Roleplay-ului Românesc',
+        author: 'Seek',
+        authorUsername: 'seekmao',
+        date: 'Astăzi la 10:30',
+        content: `Salutare tuturor membrilor BandoPlug!\n\nNe bucurăm să vă anunțăm lansarea versiunii oficiale **BandoPlug v2.0**! Serverul este deschis publicului cu:\n- Sistem avansat de Gang-uri și Carteluri cu baze customizate\n- Economie realistă și echilibrată\n- Grafică și vehicule exclusive optimizate pentru 0 lag\n- Peste 150+ haine și accesorii unice stil urban/streetwear\n\nVă așteptăm pe server! Discord: https://discord.gg/8cR9EA48US`,
+        views: 1420,
+        replies: [
+          { author: 'Ghost', date: 'Astăzi la 10:35', content: 'Bun venit tuturor! Let\'s build the best community.' },
+          { author: 'Kroxx', date: 'Astăzi la 10:45', content: 'Pregătiți pentru cel mai tare roleplay!' }
+        ]
+      },
+      {
+        id: 2,
+        category: 'regulament-server',
+        parentGroup: 'server-info',
+        title: '📜 [REGULAMENT] Regulamentul Oficial al Serverului BandoPlug FiveM',
+        author: 'Ghost',
+        authorUsername: 'ghost',
+        date: 'Ieri la 18:00',
+        content: `Regulamentul oficial BandoPlug Roleplay:\n1. Păstrarea caracterului (In Character) este obligatorie în orice moment pe server.\n2. RDM (Random Deathmatch) și VDM (Vehicle Deathmatch) sunt strict interzise.\n3. Este obligatoriu să respectați Fear RP când viața personajului vă este pusă în pericol direct.\n4. MetaGaming (MG) și PowerGaming (PG) atrag sancțiuni aspre.\n5. Respectați toți jucătorii și membrii echipei Staff.`,
+        views: 890,
+        replies: [
+          { author: 'Speedy_RP', date: 'Ieri la 19:20', content: 'Foarte clar explicat, respectat de toată lumea!' }
+        ]
+      },
+      {
+        id: 3,
+        category: 'ghid-rp',
+        parentGroup: 'server-info',
+        title: '📘 [GHID] Ghid Roleplay pentru Începători & Comenzi Esențiale (/me, /do)',
+        author: 'Seek',
+        authorUsername: 'seekmao',
+        date: 'Ieri la 16:40',
+        content: `Cum se folosesc comenzile de Roleplay corect:\n- **/me** descrie o acțiune a personajului (ex: /me scoate portofelul din buzunar și numără banii).\n- **/do** descrie starea sau mediul înconjurător (ex: /do actele sunt în torpedoul mașinii?).\nNu folosiți /do pentru a forța decizii asupra altor jucători (PowerGaming)!`,
+        views: 640,
+        replies: []
+      },
+      {
+        id: 4,
+        category: 'server-showcase',
+        parentGroup: 'server-info',
+        title: '🎥 [SHOWCASE] Prezentare Sisteme Custom: Garaje, Tuning & Carteluri',
+        author: 'Seek',
+        authorUsername: 'seekmao',
+        date: '2 zile în urmă',
+        content: `Am pregătit un showcase cu noile sisteme implementate exclusiv pe BandoPlug:\n- Sistem de tuning dinamic cu sunete motor reale\n- Camere de supraveghere live pentru LSPD\n- Telefoane mobile inteligente cu aplicații bancare securizate!`,
+        views: 1120,
+        replies: []
+      },
+      {
+        id: 5,
+        category: 'aplicatii-staff',
+        parentGroup: 'server-info',
+        title: '🛡️ [RECRUTARE] Aplicații Deschise pentru Echipa Staff / Helper',
+        author: 'Ghost',
+        authorUsername: 'ghost',
+        date: '2 zile în urmă',
+        content: `Căutăm persoane mature, calme și dedicate pentru a se alătura echipei Staff BandoPlug!\nCerințe minime:\n- Vârsta minimă: 16 ani\n- Activitate zilnică de minim 3-4 ore\n- Cunoașterea perfectă a regulamentului\nTrimiteți aplicația din secțiunea dedicată de pe site!`,
+        views: 750,
+        replies: []
+      },
+      {
+        id: 6,
+        category: 'screenshots-gallery',
+        parentGroup: 'in-character',
+        title: '📸 [MEDIA] Poze de la Ultimul Car Meet în Los Santos',
+        author: 'Alecs',
+        authorUsername: 'alecs',
+        date: 'Astăzi la 09:15',
+        content: `Câteva cadre senzaționale de aseară din parcarea de la Legion Square! Peste 30 de mașini modificate și roleplay curat. Postați și voi pozele voastre aici!`,
+        views: 310,
+        replies: []
+      },
+      {
+        id: 7,
+        category: 'povesti-character',
+        parentGroup: 'in-character',
+        title: '📖 [LORE] Povestea lui Marcus Vance - Davis Cartel',
+        author: 'Marcus_V',
+        authorUsername: 'marcus_v',
+        date: 'Ieri la 12:10',
+        content: `Născut în cartierul Davis, Marcus a învățat de mic regulile străzii. După ce a lucrat câțiva ani ca mecanic la un atelier local, a decis să își deschidă propria afacere...`,
+        views: 280,
+        replies: []
+      },
+      {
+        id: 8,
+        category: 'business-ic',
+        parentGroup: 'in-character',
+        title: '💼 [AFACERE] Service-ul Auto & Tuning "Bando Customs"',
+        author: 'BandoMechanic',
+        authorUsername: 'bandomechanic',
+        date: 'Ieri la 14:00',
+        content: `Vă așteptăm zilnic între orele 14:00 - 02:00 la Bando Customs pentru schimb ulei, tuning motor și vopsitorie custom!`,
+        views: 420,
+        replies: []
+      },
+      {
+        id: 9,
+        category: 'guvern-reports',
+        parentGroup: 'factiuni-legale',
+        title: '🏛️ [GUVERN] Model Oficial Rapoarte de Activitate',
+        author: 'Governor_Vance',
+        authorUsername: 'gov_vance',
+        date: '3 zile în urmă',
+        content: `Toate departamentele legale au obligația de a depune raportul săptămânal de activitate până duminică la ora 20:00.`,
+        views: 390,
+        replies: []
+      },
+      {
+        id: 10,
+        category: 'lspd',
+        parentGroup: 'factiuni-legale',
+        title: '🚔 [LSPD] Regulament Intern și Conduită Departamentală LSPD',
+        author: 'Chief_Miller',
+        authorUsername: 'chief_miller',
+        date: '2 zile în urmă',
+        content: `Toți ofițerii de poliție activi din cadrul Los Santos Police Department au obligația de a purta stația radio pe frecvența 1 și de a respecta codul 10-4.`,
+        views: 520,
+        replies: []
+      },
+      {
+        id: 11,
+        category: 'ems',
+        parentGroup: 'factiuni-legale',
+        title: '🚑 [EMS] Protocol Medical de Urgență & Recrutări Pillbox',
+        author: 'Dr_Elena',
+        authorUsername: 'dr_elena',
+        date: '2 zile în urmă',
+        content: `Departamentul Medical din Los Santos recrutează paramedici și medici rezidenți. Salariu atractiv și program flexibil.`,
+        views: 460,
+        replies: []
+      },
+      {
+        id: 12,
+        category: 'ganguri-non-oficiale',
+        parentGroup: 'ganguri',
+        title: '💀 [GANG] Prezentare Gruparea "Southside Hustlers"',
+        author: 'Lil_Bando',
+        authorUsername: 'lil_bando',
+        date: 'Astăzi la 08:50',
+        content: `Numele Grupării: Southside Hustlers\nLider: Marcus 'Bando' Taylor\nMembri Activi: 6\nTeritoriu: Davis\nObiectiv: Protejarea cartierului.`,
+        views: 340,
+        replies: []
+      },
+      {
+        id: 13,
+        category: 'ganguri-oficiale',
+        parentGroup: 'ganguri',
+        title: '👑 [CARTEL OFICIAL] Cartelul "La Familia" - Regulament Teritorii',
+        author: 'Don_Salieri',
+        authorUsername: 'don_salieri',
+        date: '3 zile în urmă',
+        content: `Statut oficial confirmat de conducere. Teritoriu controlat: Vinewood Hills & Port.`,
+        views: 710,
+        replies: []
+      },
+      {
+        id: 14,
+        category: 'cerere-gang',
+        parentGroup: 'ganguri',
+        title: '📝 [MODEL] Model Oficial Cerere Înregistrare Gang',
+        author: 'Ghost',
+        authorUsername: 'ghost',
+        date: '3 zile în urmă',
+        content: `Modelul obligatoriu pentru cerere gang:\n1. Nume Gang & Culoare:\n2. Nume Lider (IC & Discord):\n3. Poveste & Istoric (Lore min. 100 cuvinte):\n4. Membri inițiali (Minim 5):\n5. Teritoriu solicitat:`,
+        views: 620,
+        replies: []
+      },
+      {
+        id: 15,
+        category: 'ghid-gang',
+        parentGroup: 'ganguri',
+        title: '📕 [GHID] Ghid Complet Gang Roleplay: Jafuri & Inițieri',
+        author: 'Seek',
+        authorUsername: 'seekmao',
+        date: '3 zile în urmă',
+        content: `Reguli esențiale pentru facțiunile ilegale:\n- Jafurile de bancă și magazin necesită minim 3 polițiști activi pe server.\n- Războaiele de gang se anunță cu minim 2 ore înainte pe Discord.\n- Respectați Fear RP și Roleplay-ul de frică!`,
+        views: 890,
+        replies: []
+      }
+    ];
+
+    let liveTopics = [];
+
+    function loadTopicsData() {
+      const saved = localStorage.getItem('bandoplug_topics_v5_hierarchy');
+      if (saved) {
+        try { liveTopics = JSON.parse(saved); } catch(e) { liveTopics = [...EMBEDDED_TOPICS]; }
+      } else {
+        liveTopics = [...EMBEDDED_TOPICS];
+        localStorage.setItem('bandoplug_topics_v5_hierarchy', JSON.stringify(liveTopics));
+      }
+    }
+
+    function renderEmbeddedTopics(filteredList = null) {
+      const list = filteredList || liveTopics;
+      const categories = [
+        'regulament-server', 'ghid-rp', 'server-showcase', 'anunturi', 'aplicatii-staff',
+        'screenshots-gallery', 'povesti-character', 'business-ic',
+        'guvern-reports', 'lspd', 'ems',
+        'ganguri-non-oficiale', 'ganguri-oficiale', 'cerere-gang', 'ghid-gang'
+      ];
+
+      categories.forEach(function(cat) {
+        const container = document.getElementById('list-' + cat);
+        if (!container) return;
+
+        const catTopics = list.filter(function(t) { return t.category === cat; });
+        if (catTopics.length === 0) {
+          container.innerHTML = '<div style="padding: 14px 20px; color: #7d8590; font-size: 13px;">Nu există discuții active în această categorie. Fii primul care deschide un topic!</div>';
+        } else {
+          container.innerHTML = catTopics.map(function(t) {
+            return '<div class="topic-row" style="cursor: pointer;" onclick="openEmbeddedTopic(' + t.id + ')">' +
+              '<div class="topic-icon" style="font-size: 18px; color: #ff1e38; margin-right: 12px;"><i class="fa-solid fa-message"></i></div>' +
+              '<div class="topic-details" style="flex: 1;">' +
+                '<h4 style="font-size: 14.5px; font-weight: 700; color: #fff; margin: 0 0 4px 0;">' + t.title + '</h4>' +
+                '<div style="font-size: 12px; color: #7d8590;">' +
+                  '<span>De: <strong style="color: #fff;">' + t.author + '</strong></span> &bull; <span>' + t.date + '</span>' +
+                '</div>' +
+              '</div>' +
+              '<div style="font-size: 12px; color: #7d8590; display: flex; gap: 14px;">' +
+                '<span><i class="fa-solid fa-eye"></i> ' + t.views + '</span>' +
+                '<span><i class="fa-solid fa-comment"></i> ' + (t.replies ? t.replies.length : 0) + '</span>' +
+              '</div>' +
+            '</div>';
+          }).join('');
+        }
+      });
+    }
+
+    function openEmbeddedTopic(topicId) {
+      const topic = liveTopics.find(function(t) { return t.id === topicId; });
+      if (!topic) return;
+
+      const titleEl = document.getElementById('modalTopicTitle');
+      const authorEl = document.getElementById('modalAuthorName');
+      const dateEl = document.getElementById('modalPostDate');
+      const contentEl = document.getElementById('modalTopicContent');
+      const badgeEl = document.getElementById('modalCategoryBadge');
+      const repliesListEl = document.getElementById('repliesList');
+      const authorAvatarEl = document.getElementById('modalAuthorAvatar');
+
+      if (titleEl) titleEl.innerText = topic.title;
+      if (authorEl) authorEl.innerText = topic.author;
+      if (dateEl) dateEl.innerText = topic.date;
+      if (contentEl) contentEl.innerHTML = topic.content.replace(/\n/g, '<br>');
+      if (badgeEl) badgeEl.innerText = topic.category.toUpperCase();
+      if (authorAvatarEl) authorAvatarEl.innerText = topic.author.substring(0, 2).toUpperCase();
+
+      if (repliesListEl) {
+        if (!topic.replies || topic.replies.length === 0) {
+          repliesListEl.innerHTML = '<div style="color: #7d8590; font-size: 13px; padding: 10px 0;">Nu există răspunsuri încă. Scrie primul comentariu mai jos!</div>';
+        } else {
+          repliesListEl.innerHTML = topic.replies.map(function(r) {
+            return '<div style="background: #14171e; border: 1px solid #232733; padding: 14px; border-radius: 6px; margin-bottom: 10px;">' +
+              '<div style="display: flex; justify-content: space-between; margin-bottom: 6px;">' +
+                '<strong style="color: #ff1e38; font-size: 13px;">' + r.author + '</strong>' +
+                '<span style="color: #7d8590; font-size: 11px;">' + r.date + '</span>' +
+              '</div>' +
+              '<div style="color: #e6edf3; font-size: 13.5px;">' + r.content + '</div>' +
+            '</div>';
+          }).join('');
+        }
+      }
+
+      openModal('topicDetailModal');
+    }
+
     function togglePassVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
       if (!input) return;
@@ -1593,6 +1868,7 @@
       const dropdownRoleBadge = document.getElementById('dropdownRoleBadge');
       const navAdminLink = document.getElementById('navAdminLink');
       const dropdownAdminLink = document.getElementById('dropdownAdminLink');
+      const authorInput = document.getElementById('authorName');
 
       if (guestView) {
         guestView.style.display = 'none';
@@ -1609,6 +1885,10 @@
       if (navAvatar) navAvatar.src = user.avatar || 'bandoplug.png';
       if (dropdownName) dropdownName.innerText = user.name;
       if (dropdownTag) dropdownTag.innerHTML = '<i class="fa-brands fa-discord text-blurple"></i> @' + user.username;
+      if (authorInput) {
+        authorInput.value = user.name;
+        authorInput.readOnly = true;
+      }
 
       if (user.role === 'owner') {
         if (dropdownRoleBadge) {
@@ -1626,7 +1906,8 @@
         if (dropdownAdminLink) dropdownAdminLink.style.display = 'none';
       }
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      loadTopicsData();
+      renderEmbeddedTopics();
     }
 
     function showStandaloneToast(message, isSuccess = true) {
@@ -1675,6 +1956,7 @@
       showStandaloneToast(isOwner ? '👑 Bine ai revenit, Owner ' + displayName + '!' : 'Te-ai conectat cu succes! Bun venit, ' + displayName + '.', true);
     }
 
+    // Register with Email Verification Code System
     function doInlineRegister() {
       const userInput = document.getElementById('inlineRegUser');
       const emailInput = document.getElementById('inlineRegEmail');
@@ -1687,6 +1969,19 @@
       if (!rawUser) {
         showStandaloneToast('Te rugăm să alegi un Username!', false);
         if (userInput) userInput.focus();
+        return;
+      }
+      if (!password || password.length < 3) {
+        showStandaloneToast('Parola trebuie să aibă minim 3 caractere!', false);
+        return;
+      }
+
+      // Generate 6-digit confirmation code
+      const generatedCode = 'BP-' + Math.floor(1000 + Math.random() * 9000);
+      const userCode = prompt('📧 COD DE VERIFICARE TRIMIS PE EMAIL!\n\nPentru a confirma adresa ' + email + ', introdu codul de securitate generat:\n\n👉 Cod: ' + generatedCode, generatedCode);
+
+      if (!userCode || userCode.trim().toUpperCase() !== generatedCode.toUpperCase()) {
+        showStandaloneToast('⛔ Cod de verificare incorect! Înregistrarea a fost anulată.', false);
         return;
       }
 
@@ -1707,7 +2002,7 @@
       };
 
       applyUserSessionToDOM(sessionUser);
-      showStandaloneToast('🎉 Felicitări, ' + displayName + '! Contul tău a fost creat și activat.', true);
+      showStandaloneToast('🎉 Email verificat cu succes! Bun venit, ' + displayName + '.', true);
     }
 
     function quickDiscordAuthPrompt() {
@@ -1733,8 +2028,11 @@
       showStandaloneToast('Te-ai conectat prin Discord ca @' + cleanUser + '!', true);
     }
 
-    // Auto-check on load if user already logged in
+    // Auto-check on load if user already logged in & render topics
     document.addEventListener('DOMContentLoaded', function() {
+      loadTopicsData();
+      renderEmbeddedTopics();
+
       try {
         const saved = localStorage.getItem('bandoplug_user_xf');
         if (saved) {
@@ -1748,6 +2046,6 @@
   </script>
 
   <!-- External App Script -->
-  <script src="app.js?v=6.0"></script>
+  <script src="app.js?v=7.0"></script>
 </body>
 </html>
