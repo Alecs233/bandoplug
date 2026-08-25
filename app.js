@@ -337,16 +337,21 @@ function saveAuthUser(user) {
 }
 
 function updateAuthUI() {
-  const loggedOutGroup = document.getElementById('authLoggedOutBtns');
+  const loggedOutGroup = document.getElementById('authLoggedOutGroup');
   const loggedInWrapper = document.getElementById('authLoggedInUser');
   const navAdminLink = document.getElementById('navAdminLink');
   const dropdownAdminLink = document.getElementById('dropdownAdminLink');
   const authorInput = document.getElementById('authorName');
   const replyAuthorInput = document.getElementById('replyAuthor');
+  const guestLoginView = document.getElementById('view-guest-login');
+  const forumView = document.getElementById('view-forum');
+  const heroSection = document.getElementById('heroSection');
 
   if (currentUser) {
     if (loggedOutGroup) loggedOutGroup.style.display = 'none';
-    if (loggedInWrapper) loggedInWrapper.style.display = 'block';
+    if (loggedInWrapper) loggedInWrapper.style.display = 'flex';
+    if (guestLoginView) guestLoginView.style.display = 'none';
+    if (heroSection) heroSection.style.display = 'none';
 
     const navAvatar = document.getElementById('navUserAvatar');
     const navName = document.getElementById('navUserName');
@@ -389,7 +394,100 @@ function updateAuthUI() {
     if (loggedOutGroup) loggedOutGroup.style.display = 'flex';
     if (loggedInWrapper) loggedInWrapper.style.display = 'none';
     if (navAdminLink) navAdminLink.style.display = 'none';
+    if (heroSection) heroSection.style.display = 'none';
+    if (guestLoginView) guestLoginView.style.display = 'block';
+    if (forumView) forumView.classList.remove('active-view');
   }
+}
+
+function checkInlineOwnerInput(val) {
+  const row = document.getElementById('inlineOwnerPinRow');
+  if (row) {
+    row.style.display = isOwnerUsername(val) ? 'grid' : 'none';
+  }
+}
+
+function handleInlineLogin(e) {
+  e.preventDefault();
+  const userInput = document.getElementById('inlineLoginUser');
+  const passInput = document.getElementById('inlineLoginPass');
+  const ownerPinInput = document.getElementById('inlineOwnerPin');
+
+  const rawUser = userInput ? userInput.value.trim() : '';
+  const password = passInput ? passInput.value.trim() : '';
+
+  if (!rawUser || !password) return;
+
+  const accounts = getRegisteredAccounts();
+  const searchKey = rawUser.toLowerCase().replace(/[@#]/g, '').trim();
+
+  let account = accounts[searchKey];
+  if (!account) {
+    account = Object.values(accounts).find(acc => acc.email === searchKey);
+  }
+
+  const isOwnerAttempt = isOwnerUsername(searchKey);
+
+  if (isOwnerAttempt) {
+    const pin = ownerPinInput ? ownerPinInput.value.trim() : '';
+    if (pin !== OWNER_SECRET_PIN && password !== OWNER_SECRET_PIN) {
+      showToast('⛔ PIN de Owner incorect! Numele de conducere sunt protejate.', 'error');
+      return;
+    }
+  }
+
+  if (!account && isOwnerAttempt) {
+    const displayName = searchKey.includes('seek') ? 'Seek' : 'Ghost';
+    account = {
+      username: searchKey,
+      displayName: displayName,
+      email: `${searchKey}@bandoplug.ro`,
+      password: password,
+      role: 'owner',
+      avatar: 'bandoplug.png',
+      bio: 'Fondator & Conducere Oficială BandoPlug RP.',
+      joinedDate: 'Astăzi'
+    };
+    accounts[searchKey] = account;
+    saveRegisteredAccounts(accounts);
+  }
+
+  if (!account) {
+    showToast(`Contul cu numele/emailul "${rawUser}" nu există! Te rugăm să apeși pe "Register now" pentru a crea un cont.`, 'error');
+    openRegisterModal();
+    const regUser = document.getElementById('regXfUsername');
+    if (regUser) regUser.value = rawUser;
+    return;
+  }
+
+  if (account.password !== password && !isOwnerAttempt) {
+    showToast('Parolă incorectă! Te rugăm să încerci din nou.', 'error');
+    return;
+  }
+
+  const isOwner = account.role === 'owner' || isOwnerAttempt;
+  const sessionUser = {
+    name: account.displayName || account.username,
+    username: account.username,
+    email: account.email || `${account.username}@bandoplug.ro`,
+    role: isOwner ? 'owner' : 'member',
+    avatar: account.avatar || 'bandoplug.png',
+    bio: account.bio || 'Membru BandoPlug.',
+    tag: '@' + account.username.toLowerCase(),
+    joinedDate: account.joinedDate || 'Azi'
+  };
+
+  saveAuthUser(sessionUser);
+  const form = document.getElementById('inlineLoginForm');
+  if (form) form.reset();
+
+  if (isOwner) {
+    showToast(`👑 Bine ai revenit, Owner ${sessionUser.name}!`, 'success');
+  } else {
+    showToast(`Te-ai conectat cu succes! Bun venit, ${sessionUser.name}.`, 'success');
+  }
+
+  switchView('forum');
 }
 
 // User Dropdown in Nav
@@ -1329,26 +1427,31 @@ function filterTopics() {
 }
 
 function switchView(viewName) {
-  if (!currentUser && (viewName === 'aplicatii' || viewName === 'admin' || viewName === 'profile')) {
-    showGlobalGuestAlert('Trebuie să fii autentificat pentru a accesa această secțiune a comunității!');
-    openLoginModal();
+  if (!currentUser) {
+    updateAuthUI();
+    showToast('⚠️ Trebuie să fii conectat pe cont pentru a accesa această secțiune!', 'info');
+    const input = document.getElementById('inlineLoginUser');
+    if (input) input.focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
   }
 
-  document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active-view'));
+  document.querySelectorAll('.app-view').forEach(view => {
+    view.classList.remove('active-view');
+    view.style.display = 'none';
+  });
   document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
 
-  const targetView = document.getElementById(`view-${viewName}`);
-  const hero = document.getElementById('heroSection');
+  const guestLoginView = document.getElementById('view-guest-login');
+  if (guestLoginView) guestLoginView.style.display = 'none';
 
-  if (viewName === 'home') {
-    document.getElementById('view-forum').classList.add('active-view');
-    if (hero) hero.style.display = 'block';
-    const navLink = document.querySelector('.nav-link[href="#home"]');
-    if (navLink) navLink.classList.add('active');
-  } else if (targetView) {
+  let targetId = `view-${viewName}`;
+  if (viewName === 'home' || viewName === 'forum') targetId = 'view-forum';
+
+  const targetView = document.getElementById(targetId);
+  if (targetView) {
     targetView.classList.add('active-view');
-    if (hero) hero.style.display = 'none';
+    targetView.style.display = 'block';
     const navLink = document.querySelector(`.nav-link[href="#${viewName}"]`);
     if (navLink) navLink.classList.add('active');
   }

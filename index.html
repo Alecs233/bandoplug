@@ -203,7 +203,105 @@
   <!-- MAIN APP CONTAINER (Views) -->
   <main class="container main-content-wrapper">
 
-    <!-- VIEW 1: HOME & FORUMS -->
+    <!-- GUEST VIEW: EXACT WINDY CITY STYLE LOGIN (Visible when not logged in) -->
+    <div id="view-guest-login" class="app-view">
+      <div class="xf-guest-container">
+        
+        <!-- Center Logo -->
+        <div class="xf-center-logo-wrap">
+          <img src="bandoplug.png" onerror="this.onerror=null; this.src='assets/bandoplug.png';" alt="BandoPlug RP" class="xf-center-logo-img">
+        </div>
+
+        <!-- Season Banner -->
+        <div class="xf-season-box">
+          <h3>BandoPlug Season 1</h3>
+          <p>Season 1 Is Here! Comunitate Exclusivistă FiveM Roleplay</p>
+        </div>
+
+        <!-- Standalone Login Card (Screenshot 1 Exact Replica) -->
+        <div class="xf-login-standalone-card">
+          <div class="xf-login-standalone-header">Log in</div>
+          <div class="xf-login-standalone-body">
+            
+            <div class="xf-guest-alert-banner">
+              <i class="fa-solid fa-circle-xmark"></i>
+              <span>You must be logged-in to do that. (Trebuie să fii conectat pe cont pentru a accesa forumul)</span>
+            </div>
+
+            <form id="inlineLoginForm" onsubmit="handleInlineLogin(event)">
+              <div class="xf-form-row">
+                <div class="xf-label">
+                  <label for="inlineLoginUser">Your name or email address:</label>
+                </div>
+                <div class="xf-field">
+                  <input type="text" id="inlineLoginUser" required placeholder="ex: Alecs233 sau seekmao sau alex@gmail.com" oninput="checkInlineOwnerInput(this.value)">
+                </div>
+              </div>
+
+              <div class="xf-form-row">
+                <div class="xf-label">
+                  <label for="inlineLoginPass">Password:</label>
+                </div>
+                <div class="xf-field">
+                  <div class="xf-password-wrap">
+                    <input type="password" id="inlineLoginPass" required placeholder="Parolă...">
+                    <button type="button" class="btn-xf-toggle-pass" onclick="togglePassVisibility('inlineLoginPass', this)">
+                      <i class="fa-regular fa-eye"></i> Show
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="xf-form-row" id="inlineOwnerPinRow" style="display: none; background: rgba(245, 158, 11, 0.08); padding: 12px; border-radius: 6px; border: 1px dashed var(--gold-accent);">
+                <div class="xf-label">
+                  <label for="inlineOwnerPin" class="text-gold"><i class="fa-solid fa-shield-halved"></i> Owner PIN:</label>
+                </div>
+                <div class="xf-field">
+                  <input type="password" id="inlineOwnerPin" placeholder="Introdu Codul Secret (ex: bando2026)">
+                </div>
+              </div>
+
+              <div class="xf-form-row">
+                <div class="xf-label"></div>
+                <div class="xf-field">
+                  <label class="xf-terms-checkbox">
+                    <input type="checkbox" id="inlineStayLoggedIn" checked>
+                    <span>Stay logged in</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="xf-form-row">
+                <div class="xf-label"></div>
+                <div class="xf-field" style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+                  <button type="submit" class="btn btn-green" style="padding: 10px 24px; font-weight: 700;">
+                    <i class="fa-solid fa-right-to-bracket"></i> Log in
+                  </button>
+                  <span style="font-size: 13.5px; color: var(--text-muted);">
+                    Don't have an account? <a href="javascript:void(0)" onclick="openRegisterModal()" style="color: var(--primary-red); font-weight: 700; text-decoration: underline;">Register now</a>
+                  </span>
+                </div>
+              </div>
+
+              <div class="xf-divider-line" style="margin: 18px 0;"></div>
+
+              <div class="xf-form-row xf-fast-auth">
+                <div class="xf-label">Log in using:</div>
+                <div class="xf-field">
+                  <button type="button" class="btn btn-discord btn-xf-discord" onclick="handleFastDiscordRegister()">
+                    <i class="fa-brands fa-discord"></i> Discord
+                  </button>
+                </div>
+              </div>
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VIEW 1: HOME & FORUMS (Visible when logged in) -->
     <div id="view-forum" class="app-view active-view">
       
       <!-- XenForo Red Guest Alert Banner (Visible when unauthenticated user tries to click) -->

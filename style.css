@@ -1441,6 +1441,72 @@ a {
   color: #7d8590;
 }
 
+/* XenForo Exact Guest View */
+.xf-guest-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px 15px 50px 15px;
+}
+
+.xf-center-logo-wrap {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.xf-center-logo-img {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: contain;
+  background: #000;
+  border: 3px solid var(--primary-red);
+  box-shadow: 0 0 35px rgba(255, 30, 56, 0.45);
+}
+
+.xf-season-box {
+  background: #14161d;
+  border: 1px solid #232733;
+  border-radius: 6px;
+  padding: 16px 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.xf-season-box h3 {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.xf-season-box p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.xf-login-standalone-card {
+  background: #14161d;
+  border: 1px solid #232733;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+.xf-login-standalone-header {
+  background: #1c202a;
+  border-bottom: 1px solid #282f3d;
+  padding: 14px 20px;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.xf-login-standalone-body {
+  padding: 24px;
+}
+
 /* XenForo Style Guest Block Alert Banner */
 .xf-guest-alert-banner {
   background: #670b14;
