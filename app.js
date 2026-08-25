@@ -400,11 +400,148 @@ function updateAuthUI() {
   }
 }
 
+function switchGuestTab(tab) {
+  const loginForm = document.getElementById('inlineLoginForm');
+  const regForm = document.getElementById('inlineRegisterForm');
+  const loginBtn = document.getElementById('tabGuestLoginBtn');
+  const regBtn = document.getElementById('tabGuestRegisterBtn');
+
+  if (tab === 'login') {
+    if (loginForm) loginForm.style.display = 'block';
+    if (regForm) regForm.style.display = 'none';
+    if (loginBtn) {
+      loginBtn.classList.add('active');
+      loginBtn.style.borderBottom = '2px solid var(--primary-red)';
+      loginBtn.style.color = '#fff';
+      loginBtn.style.background = 'transparent';
+    }
+    if (regBtn) {
+      regBtn.classList.remove('active');
+      regBtn.style.borderBottom = '2px solid transparent';
+      regBtn.style.color = 'var(--text-muted)';
+      regBtn.style.background = 'rgba(0,0,0,0.2)';
+    }
+  } else {
+    if (loginForm) loginForm.style.display = 'none';
+    if (regForm) regForm.style.display = 'block';
+    if (regBtn) {
+      regBtn.classList.add('active');
+      regBtn.style.borderBottom = '2px solid var(--primary-red)';
+      regBtn.style.color = '#fff';
+      regBtn.style.background = 'transparent';
+    }
+    if (loginBtn) {
+      loginBtn.classList.remove('active');
+      loginBtn.style.borderBottom = '2px solid transparent';
+      loginBtn.style.color = 'var(--text-muted)';
+      loginBtn.style.background = 'rgba(0,0,0,0.2)';
+    }
+  }
+}
+
 function checkInlineOwnerInput(val) {
   const row = document.getElementById('inlineOwnerPinRow');
   if (row) {
     row.style.display = isOwnerUsername(val) ? 'grid' : 'none';
   }
+}
+
+function checkInlineRegOwnerInput(val) {
+  const row = document.getElementById('inlineRegOwnerPinRow');
+  if (row) {
+    row.style.display = isOwnerUsername(val) ? 'grid' : 'none';
+  }
+}
+
+// Quick Discord Auth Handler (1-Click or Direct Tag prompt)
+function quickDiscordAuthPrompt() {
+  const defaultTag = currentUser ? currentUser.username : 'Seek';
+  const discordUser = prompt('Introdu Tag-ul sau Numele tău de Discord:', defaultTag);
+  if (!discordUser || !discordUser.trim()) return;
+
+  const username = discordUser.trim().replace(/[@#]/g, '');
+  const isOwner = isOwnerUsername(username);
+
+  if (isOwner) {
+    const pin = prompt('Numele ' + username + ' este rezervat Conducerii! Introdu Codul Secret de Owner (PIN):', '');
+    if (pin !== OWNER_SECRET_PIN) {
+      showToast('⛔ PIN de Owner incorect! Nu poți accesa contul de conducere fără codul secret.', 'error');
+      return;
+    }
+  }
+
+  authenticateDiscordUserData(username, 'bandoplug.png', `${username.toLowerCase()}@discord.auth`, isOwner);
+}
+
+function handleInlineRegister(e) {
+  e.preventDefault();
+  const userInput = document.getElementById('inlineRegUser');
+  const emailInput = document.getElementById('inlineRegEmail');
+  const passInput = document.getElementById('inlineRegPass');
+  const pinInput = document.getElementById('inlineRegOwnerPin');
+
+  const rawUser = userInput ? userInput.value.trim() : '';
+  const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+  const password = passInput ? passInput.value.trim() : '';
+
+  if (!rawUser || !email || !password) {
+    showToast('Te rugăm să completezi toate câmpurile!', 'error');
+    return;
+  }
+
+  const validation = validateUsername(rawUser);
+  if (!validation.valid) {
+    showToast(validation.error, 'error');
+    return;
+  }
+
+  const username = validation.clean;
+  const isOwner = isOwnerUsername(username);
+
+  if (isOwner) {
+    const pin = pinInput ? pinInput.value.trim() : '';
+    if (pin !== OWNER_SECRET_PIN) {
+      showToast('⛔ Numele conducerii necesită Codul Secret de Owner corect (ex: bando2026)!', 'error');
+      return;
+    }
+  }
+
+  const accounts = getRegisteredAccounts();
+  const userKey = username.toLowerCase();
+  const displayName = isOwner ? (userKey.includes('seek') ? 'Seek' : 'Ghost') : username;
+  const userRole = isOwner ? 'owner' : 'member';
+
+  const newAccount = {
+    username: username,
+    displayName: displayName,
+    email: email,
+    password: password,
+    role: userRole,
+    avatar: 'bandoplug.png',
+    bio: isOwner ? 'Fondator & Conducere Oficială BandoPlug RP.' : 'Membru pe forumul oficial BandoPlug.',
+    joinedDate: 'Astăzi',
+    createdAt: new Date().toISOString()
+  };
+
+  accounts[userKey] = newAccount;
+  saveRegisteredAccounts(accounts);
+
+  saveAuthUser({
+    name: displayName,
+    username: username,
+    email: email,
+    role: userRole,
+    avatar: 'bandoplug.png',
+    bio: newAccount.bio,
+    tag: '@' + username.toLowerCase(),
+    joinedDate: 'Astăzi'
+  });
+
+  const form = document.getElementById('inlineRegisterForm');
+  if (form) form.reset();
+
+  showToast(`🎉 Felicitări, ${displayName}! Contul tău a fost creat și activat cu succes.`, 'success');
+  switchView('forum');
 }
 
 function handleInlineLogin(e) {
@@ -436,28 +573,23 @@ function handleInlineLogin(e) {
     }
   }
 
-  if (!account && isOwnerAttempt) {
-    const displayName = searchKey.includes('seek') ? 'Seek' : 'Ghost';
+  // If user doesn't exist yet, auto-register them seamlessly so nobody gets stuck!
+  if (!account) {
+    const displayName = isOwnerAttempt ? (searchKey.includes('seek') ? 'Seek' : 'Ghost') : rawUser;
+    const userRole = isOwnerAttempt ? 'owner' : 'member';
     account = {
-      username: searchKey,
+      username: rawUser,
       displayName: displayName,
       email: `${searchKey}@bandoplug.ro`,
       password: password,
-      role: 'owner',
+      role: userRole,
       avatar: 'bandoplug.png',
-      bio: 'Fondator & Conducere Oficială BandoPlug RP.',
-      joinedDate: 'Astăzi'
+      bio: isOwnerAttempt ? 'Fondator & Conducere Oficială BandoPlug RP.' : 'Membru pe forumul BandoPlug.',
+      joinedDate: 'Astăzi',
+      createdAt: new Date().toISOString()
     };
     accounts[searchKey] = account;
     saveRegisteredAccounts(accounts);
-  }
-
-  if (!account) {
-    showToast(`Contul cu numele/emailul "${rawUser}" nu există! Te rugăm să apeși pe "Register now" pentru a crea un cont.`, 'error');
-    openRegisterModal();
-    const regUser = document.getElementById('regXfUsername');
-    if (regUser) regUser.value = rawUser;
-    return;
   }
 
   if (account.password !== password && !isOwnerAttempt) {
@@ -511,13 +643,25 @@ document.addEventListener('click', (e) => {
 
 // Modals Trigger
 function openLoginModal() {
-  closeModal('registerModal');
-  openModal('loginModal');
+  if (!currentUser) {
+    switchGuestTab('login');
+    const input = document.getElementById('inlineLoginUser');
+    if (input) input.focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    openModal('loginModal');
+  }
 }
 
 function openRegisterModal() {
-  closeModal('loginModal');
-  openModal('registerModal');
+  if (!currentUser) {
+    switchGuestTab('register');
+    const input = document.getElementById('inlineRegUser');
+    if (input) input.focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    openModal('registerModal');
+  }
 }
 
 function togglePassVisibility(inputId, btn) {
