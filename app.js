@@ -337,7 +337,7 @@ function saveAuthUser(user) {
 }
 
 function updateAuthUI() {
-  const loggedOutGroup = document.getElementById('authLoggedOutGroup');
+  const loggedOutGroup = document.getElementById('authLoggedOutBtns') || document.getElementById('authLoggedOutGroup');
   const loggedInWrapper = document.getElementById('authLoggedInUser');
   const navAdminLink = document.getElementById('navAdminLink');
   const dropdownAdminLink = document.getElementById('dropdownAdminLink');
@@ -350,8 +350,15 @@ function updateAuthUI() {
   if (currentUser) {
     if (loggedOutGroup) loggedOutGroup.style.display = 'none';
     if (loggedInWrapper) loggedInWrapper.style.display = 'flex';
-    if (guestLoginView) guestLoginView.style.display = 'none';
+    if (guestLoginView) {
+      guestLoginView.style.display = 'none';
+      guestLoginView.classList.remove('active-view');
+    }
     if (heroSection) heroSection.style.display = 'none';
+    if (forumView) {
+      forumView.style.display = 'block';
+      forumView.classList.add('active-view');
+    }
 
     const navAvatar = document.getElementById('navUserAvatar');
     const navName = document.getElementById('navUserName');
@@ -395,8 +402,14 @@ function updateAuthUI() {
     if (loggedInWrapper) loggedInWrapper.style.display = 'none';
     if (navAdminLink) navAdminLink.style.display = 'none';
     if (heroSection) heroSection.style.display = 'none';
-    if (guestLoginView) guestLoginView.style.display = 'block';
-    if (forumView) forumView.classList.remove('active-view');
+    if (guestLoginView) {
+      guestLoginView.style.display = 'block';
+      guestLoginView.classList.add('active-view');
+    }
+    if (forumView) {
+      forumView.style.display = 'none';
+      forumView.classList.remove('active-view');
+    }
   }
 }
 
