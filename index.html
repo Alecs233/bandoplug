@@ -2285,6 +2285,19 @@
       }, 3500);
     }
 
+    const MASTER_OWNER_PIN = 'bando2026';
+
+    function getStoredAccounts() {
+      try {
+        const s = localStorage.getItem('bandoplug_accounts_xf');
+        return s ? JSON.parse(s) : {};
+      } catch(e) { return {}; }
+    }
+
+    function saveStoredAccounts(accs) {
+      localStorage.setItem('bandoplug_accounts_xf', JSON.stringify(accs));
+    }
+
     function doInlineLogin() {
       const userInput = document.getElementById('inlineLoginUser');
       const passInput = document.getElementById('inlineLoginPass');
@@ -2299,8 +2312,40 @@
 
       const cleanUser = rawUser.replace(/[@#]/g, '').trim();
       const isOwner = isOwnerUsername(cleanUser);
+      const accounts = getStoredAccounts();
+      const userKey = cleanUser.toLowerCase();
+
+      // STRICT SECURITY FOR OWNER ACCOUNTS (Seek & Ghost)
+      if (isOwner) {
+        const existingAcc = accounts[userKey];
+        const validPass = (existingAcc && existingAcc.password) ? existingAcc.password : MASTER_OWNER_PIN;
+        if (password !== validPass && password !== MASTER_OWNER_PIN) {
+          showStandaloneToast('⛔ ACCES RESPINS! Numele ' + cleanUser + ' este rezervat exclusiv Conducerii! Parolă de Owner incorectă.', false);
+          return;
+        }
+      } else {
+        // Regular account check
+        const existingAcc = accounts[userKey];
+        if (existingAcc && existingAcc.password && existingAcc.password !== password) {
+          showStandaloneToast('⛔ Parolă incorectă pentru contul "' + cleanUser + '"!', false);
+          return;
+        }
+      }
+
       const displayName = isOwner ? (cleanUser.toLowerCase().includes('seek') ? 'Seek' : 'Ghost') : cleanUser;
       const userRole = isOwner ? 'owner' : 'member';
+
+      // Save account to DB if new
+      if (!accounts[userKey]) {
+        accounts[userKey] = {
+          username: cleanUser,
+          name: displayName,
+          password: password,
+          role: userRole,
+          email: cleanUser.toLowerCase() + '@bandoplug.ro'
+        };
+        saveStoredAccounts(accounts);
+      }
 
       const sessionUser = {
         name: displayName,
@@ -2317,7 +2362,7 @@
       showStandaloneToast(isOwner ? '👑 Bine ai revenit, Owner ' + displayName + '!' : 'Te-ai conectat cu succes! Bun venit, ' + displayName + '.', true);
     }
 
-    // Register with Email Verification Code System
+    // Register with Email Verification Code System & Anti-Impersonation
     function doInlineRegister() {
       const userInput = document.getElementById('inlineRegUser');
       const emailInput = document.getElementById('inlineRegEmail');
@@ -2337,6 +2382,23 @@
         return;
       }
 
+      const cleanUser = rawUser.replace(/[@#]/g, '').trim();
+      const isOwner = isOwnerUsername(cleanUser);
+      const accounts = getStoredAccounts();
+      const userKey = cleanUser.toLowerCase();
+
+      // Anti-Theft Protection: Protect Seek & Ghost from being registered by strangers
+      if (isOwner) {
+        const pin = prompt('🔒 PROTECȚIE CONDUCERE!\n\nNumele ' + cleanUser + ' este rezervat exclusiv Fondatorilor BandoPlug.\nIntrodu Codul Secret de Owner (PIN) pentru a valida:', '');
+        if (pin !== MASTER_OWNER_PIN && password !== MASTER_OWNER_PIN) {
+          showStandaloneToast('⛔ Cod Secret de Owner incorect! Nu poți crea cont cu numele conducerii.', false);
+          return;
+        }
+      } else if (accounts[userKey]) {
+        showStandaloneToast('⚠️ Numele de utilizator "' + cleanUser + '" este deja ocupat! Te rugăm să alegi alt nume sau să te conectezi.', false);
+        return;
+      }
+
       // Generate 6-digit confirmation code
       const generatedCode = 'BP-' + Math.floor(1000 + Math.random() * 9000);
       const userCode = prompt('📧 COD DE VERIFICARE TRIMIS PE EMAIL!\n\nPentru a confirma adresa ' + email + ', introdu codul de securitate generat:\n\n👉 Cod: ' + generatedCode, generatedCode);
@@ -2346,10 +2408,17 @@
         return;
       }
 
-      const cleanUser = rawUser.replace(/[@#]/g, '').trim();
-      const isOwner = isOwnerUsername(cleanUser);
       const displayName = isOwner ? (cleanUser.toLowerCase().includes('seek') ? 'Seek' : 'Ghost') : cleanUser;
       const userRole = isOwner ? 'owner' : 'member';
+
+      accounts[userKey] = {
+        username: cleanUser,
+        name: displayName,
+        password: password,
+        role: userRole,
+        email: email
+      };
+      saveStoredAccounts(accounts);
 
       const sessionUser = {
         name: displayName,
@@ -2372,6 +2441,15 @@
 
       const cleanUser = discordUser.trim().replace(/[@#]/g, '');
       const isOwner = isOwnerUsername(cleanUser);
+
+      if (isOwner) {
+        const pin = prompt('🔒 Numele ' + cleanUser + ' este rezervat Fondatorilor! Introdu Codul Secret de Owner (PIN):', '');
+        if (pin !== MASTER_OWNER_PIN) {
+          showStandaloneToast('⛔ Cod Secret de Owner incorect! Acces refuzat.', false);
+          return;
+        }
+      }
+
       const displayName = isOwner ? (cleanUser.toLowerCase().includes('seek') ? 'Seek' : 'Ghost') : cleanUser;
 
       const sessionUser = {
