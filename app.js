@@ -597,30 +597,20 @@ function showGlobalGuestAlert(msg) {
   }
 }
 
-// XenForo Registration Handler (With Captcha & 6-digit Email Confirmation)
+// XenForo Registration Handler
 function handleXenForoRegister(e) {
   e.preventDefault();
   const usernameInput = document.getElementById('regXfUsername');
   const emailInput = document.getElementById('regXfEmail');
   const passInput = document.getElementById('regXfPassword');
-  const captchaCheck = document.getElementById('hCaptchaCheck');
-  const captchaTextInput = document.getElementById('regCaptchaInput');
   const ownerPinInput = document.getElementById('regOwnerPin');
 
-  const rawUsername = usernameInput.value.trim();
-  const email = emailInput.value.trim().toLowerCase();
-  const password = passInput.value.trim();
-  const enteredCaptcha = captchaTextInput ? captchaTextInput.value.trim().toUpperCase().replace(/\s/g, '') : '';
+  const rawUsername = usernameInput ? usernameInput.value.trim() : '';
+  const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+  const password = passInput ? passInput.value.trim() : '';
 
-  if (enteredCaptcha !== currentCaptchaCode) {
-    showToast('Codul de securitate (Captcha) este incorect! Încearcă din nou.', 'error');
-    generateNewCaptcha();
-    if (captchaTextInput) captchaTextInput.value = '';
-    return;
-  }
-
-  if (!captchaCheck || !captchaCheck.checked) {
-    showToast('Te rugăm să bifezi căsuța de verificare "Eu sunt om" (hCaptcha)!', 'error');
+  if (!rawUsername || !email || !password) {
+    showToast('Te rugăm să completezi toate câmpurile obligatorii!', 'error');
     return;
   }
 
@@ -660,13 +650,15 @@ function handleXenForoRegister(e) {
   if (accounts[userKey]) {
     showToast(`Utilizatorul "${username}" este deja înregistrat! Te rugăm să te conectezi.`, 'error');
     openLoginModal();
-    document.getElementById('loginXfUser').value = username;
+    const loginUser = document.getElementById('loginXfUser');
+    if (loginUser) loginUser.value = username;
     return;
   }
 
   const emailExists = Object.values(accounts).some(acc => acc.email === email);
   if (emailExists) {
-    showToast(`Adresa de email "${email}" este deja asociată unui cont!`, 'error');
+    showToast(`Adresa de email "${email}" este deja asociată unui cont! Te rugăm să te conectezi.`, 'error');
+    openLoginModal();
     return;
   }
 
@@ -675,10 +667,7 @@ function handleXenForoRegister(e) {
   const avatar = 'bandoplug.png';
   const bio = isOwner ? 'Fondator & Conducere Oficială BandoPlug FiveM Roleplay.' : 'Nou membru înregistrat pe forumul oficial BandoPlug.';
 
-  // Generate 6-Digit Email Verification Code
-  const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-  pendingRegistrationData = {
+  const newAccount = {
     username: username,
     displayName: displayName,
     email: email,
@@ -686,47 +675,7 @@ function handleXenForoRegister(e) {
     role: userRole,
     avatar: avatar,
     bio: bio,
-    code: verifyCode
-  };
-
-  const displayEl = document.getElementById('verifyEmailDisplay');
-  if (displayEl) displayEl.innerText = email;
-
-  closeModal('registerModal');
-  document.getElementById('xfRegisterForm').reset();
-  openModal('emailVerifyModal');
-
-  // Trigger Incoming Verification Email Notification
-  setTimeout(() => {
-    showToast(`📩 [Email BandoPlug] Codul tău de verificare este: <strong style="color:#ff1e38; font-size:16px;">${verifyCode}</strong>`, 'info');
-  }, 400);
-}
-
-// Confirm Email 6-digit Code Handler
-function handleConfirmEmailCode(e) {
-  e.preventDefault();
-  const codeInput = document.getElementById('emailVerifyCodeInput');
-  const enteredCode = codeInput ? codeInput.value.trim() : '';
-
-  if (!pendingRegistrationData || enteredCode !== pendingRegistrationData.code) {
-    showToast('Codul de verificare introdus este incorect! Te rugăm să verifici email-ul.', 'error');
-    return;
-  }
-
-  const data = pendingRegistrationData;
-  const accounts = getRegisteredAccounts();
-  const userKey = data.username.toLowerCase();
-
-  const newAccount = {
-    username: data.username,
-    displayName: data.displayName,
-    email: data.email,
-    password: data.password,
-    role: data.role,
-    avatar: data.avatar,
-    bio: data.bio,
     joinedDate: 'Astăzi',
-    emailVerified: true,
     createdAt: new Date().toISOString()
   };
 
@@ -734,38 +683,33 @@ function handleConfirmEmailCode(e) {
   saveRegisteredAccounts(accounts);
 
   const sessionUser = {
-    name: data.displayName,
-    username: data.username,
-    email: data.email,
-    role: data.role,
-    avatar: data.avatar,
-    bio: data.bio,
-    tag: '@' + data.username.toLowerCase(),
+    name: displayName,
+    username: username,
+    email: email,
+    role: userRole,
+    avatar: avatar,
+    bio: bio,
+    tag: '@' + username.toLowerCase(),
     joinedDate: 'Astăzi'
   };
 
   saveAuthUser(sessionUser);
-  closeModal('emailVerifyModal');
-  if (codeInput) codeInput.value = '';
-  pendingRegistrationData = null;
+  closeModal('registerModal');
+  const form = document.getElementById('xfRegisterForm');
+  if (form) form.reset();
 
-  showToast(`🎉 Contul tău a fost confirmat și activat cu succes! Bun venit, ${sessionUser.name}.`, 'success');
+  const banner = document.getElementById('globalGuestBanner');
+  if (banner) banner.style.display = 'none';
 
-  if (data.role === 'owner') {
-    showToast(`👑 Rol de OWNER activat pentru ${sessionUser.name}!`, 'success');
+  showToast(`🎉 Felicitări, ${displayName}! Contul tău a fost creat și activat cu succes.`, 'success');
+
+  if (isOwner) {
+    showToast(`👑 Rol de OWNER activat pentru ${displayName}!`, 'success');
     switchView('admin');
   } else {
     renderProfileView();
     switchView('profile');
   }
-}
-
-// Resend Email Verification Code
-function resendEmailVerificationCode() {
-  if (!pendingRegistrationData) return;
-  const newCode = Math.floor(100000 + Math.random() * 900000).toString();
-  pendingRegistrationData.code = newCode;
-  showToast(`📩 [Email BandoPlug] Un nou cod de verificare a fost expediat: <strong style="color:#ff1e38; font-size:16px;">${newCode}</strong>`, 'info');
 }
 
 // XenForo Log In Handler

@@ -956,34 +956,19 @@
 
         <div class="xf-form-row">
           <div class="xf-label">
-            <label for="regCaptchaInput">Security Code:</label>
-            <small class="text-muted">Captcha</small>
-          </div>
-          <div class="xf-field">
-            <div class="captcha-box-wrapper">
-              <div class="captcha-code-display" id="captchaDisplay">7 X 9 K</div>
-              <button type="button" class="btn-refresh-captcha" onclick="generateNewCaptcha()" title="Schimbă codul"><i class="fa-solid fa-arrows-rotate"></i></button>
-            </div>
-            <input type="text" id="regCaptchaInput" required placeholder="Tastează codul de mai sus...">
-            <div class="xf-help-text">Introdu caracterele de securitate pentru a dovedi că ești o persoană reală.</div>
-          </div>
-        </div>
-
-        <div class="xf-form-row">
-          <div class="xf-label">
-            <label>Verification:</label>
-            <small class="text-muted">Required</small>
+            <label for="hCaptchaCheck">Verification:</label>
+            <small class="text-muted">Anti-Bot</small>
           </div>
           <div class="xf-field">
             <div class="xf-hcaptcha-box">
               <label class="hcaptcha-checkbox-label">
-                <input type="checkbox" id="hCaptchaCheck" required>
+                <input type="checkbox" id="hCaptchaCheck" checked>
                 <span class="custom-checkbox"></span>
-                <span>Eu sunt om</span>
+                <span><i class="fa-solid fa-shield-check text-green"></i> Confirm că sunt o persoană reală</span>
               </label>
               <div class="hcaptcha-branding">
                 <i class="fa-solid fa-hand-holding-hand text-blue"></i>
-                <div><strong>hCaptcha</strong><br><small>Confidențialitate - Termeni</small></div>
+                <div><strong>Securitate</strong><br><small>Protecție Anti-Bot</small></div>
               </div>
             </div>
           </div>
@@ -993,15 +978,15 @@
           <div class="xf-label"></div>
           <div class="xf-field">
             <label class="xf-terms-checkbox">
-              <input type="checkbox" id="termsCheck" required checked>
-              <span>I agree to the <strong>terms</strong> and <strong>privacy policy</strong>.</span>
+              <input type="checkbox" id="termsCheck" checked>
+              <span>Sunt de acord cu <strong>regulamentul</strong> și <strong>termenii</strong> comunității BandoPlug.</span>
             </label>
           </div>
         </div>
 
         <div class="modal-footer justify-start">
           <button type="submit" class="btn btn-green btn-xf-submit">
-            <i class="fa-solid fa-user-plus"></i> Register
+            <i class="fa-solid fa-user-plus"></i> Creează Cont (Register)
           </button>
           <button type="button" class="btn btn-secondary" onclick="closeModal('registerModal'); openLoginModal();">
             Ai deja cont? Conectare
