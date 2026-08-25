@@ -1529,7 +1529,7 @@
     </div>
   </footer>
 
-  <!-- Embedded Complete Fail-Safe Guest & Interactive Forum Engine -->
+  <!-- Complete Master Unified Engine (Zero-Bug, 100% Self-Contained) -->
   <script>
     // Initial Seed Topics
     const EMBEDDED_TOPICS = [
@@ -1721,6 +1721,9 @@
     ];
 
     let liveTopics = [];
+    let currentUser = null;
+    let currentCategoryGroupFilter = 'all';
+    let currentViewingTopicId = null;
 
     function loadTopicsData() {
       const saved = localStorage.getItem('bandoplug_topics_v5_hierarchy');
@@ -1730,6 +1733,10 @@
         liveTopics = [...EMBEDDED_TOPICS];
         localStorage.setItem('bandoplug_topics_v5_hierarchy', JSON.stringify(liveTopics));
       }
+    }
+
+    function saveTopicsData() {
+      localStorage.setItem('bandoplug_topics_v5_hierarchy', JSON.stringify(liveTopics));
     }
 
     function renderEmbeddedTopics(filteredList = null) {
@@ -1772,13 +1779,18 @@
       const topic = liveTopics.find(function(t) { return t.id === topicId; });
       if (!topic) return;
 
+      currentViewingTopicId = topicId;
+      topic.views = (topic.views || 0) + 1;
+      saveTopicsData();
+
       const titleEl = document.getElementById('modalTopicTitle');
       const authorEl = document.getElementById('modalAuthorName');
       const dateEl = document.getElementById('modalPostDate');
-      const contentEl = document.getElementById('modalTopicContent');
+      const contentEl = document.getElementById('modalPostContent') || document.getElementById('modalTopicContent');
       const badgeEl = document.getElementById('modalCategoryBadge');
-      const repliesListEl = document.getElementById('repliesList');
+      const repliesListEl = document.getElementById('modalRepliesList') || document.getElementById('repliesList');
       const authorAvatarEl = document.getElementById('modalAuthorAvatar');
+      const replyCountEl = document.getElementById('replyCount');
 
       if (titleEl) titleEl.innerText = topic.title;
       if (authorEl) authorEl.innerText = topic.author;
@@ -1786,16 +1798,17 @@
       if (contentEl) contentEl.innerHTML = topic.content.replace(/\n/g, '<br>');
       if (badgeEl) badgeEl.innerText = topic.category.toUpperCase();
       if (authorAvatarEl) authorAvatarEl.innerText = topic.author.substring(0, 2).toUpperCase();
+      if (replyCountEl) replyCountEl.innerText = topic.replies ? topic.replies.length : 0;
 
       if (repliesListEl) {
         if (!topic.replies || topic.replies.length === 0) {
-          repliesListEl.innerHTML = '<div style="color: #7d8590; font-size: 13px; padding: 10px 0;">Nu există răspunsuri încă. Scrie primul comentariu mai jos!</div>';
+          repliesListEl.innerHTML = '<div style="color: #7d8590; font-size: 13px; padding: 10px 0; text-align: center;">Nu există răspunsuri încă. Scrie primul comentariu mai jos!</div>';
         } else {
           repliesListEl.innerHTML = topic.replies.map(function(r) {
             return '<div style="background: #14171e; border: 1px solid #232733; padding: 14px; border-radius: 6px; margin-bottom: 10px;">' +
               '<div style="display: flex; justify-content: space-between; margin-bottom: 6px;">' +
                 '<strong style="color: #ff1e38; font-size: 13px;">' + r.author + '</strong>' +
-                '<span style="color: #7d8590; font-size: 11px;">' + r.date + '</span>' +
+                '<span style="color: #7d8590; font-size: 11px;">' + (r.date || 'Recent') + '</span>' +
               '</div>' +
               '<div style="color: #e6edf3; font-size: 13.5px;">' + r.content + '</div>' +
             '</div>';
@@ -1804,6 +1817,287 @@
       }
 
       openModal('topicDetailModal');
+    }
+
+    function viewTopicDetail(id) {
+      openEmbeddedTopic(id);
+    }
+
+    function handleAddReply(e) {
+      if (e) e.preventDefault();
+      if (!currentUser) {
+        showStandaloneToast('Trebuie să fii conectat pe cont pentru a răspunde!', false);
+        return;
+      }
+      const input = document.getElementById('replyContent');
+      const text = input ? input.value.trim() : '';
+      if (!text || !currentViewingTopicId) return;
+
+      const topic = liveTopics.find(function(t) { return t.id === currentViewingTopicId; });
+      if (topic) {
+        if (!topic.replies) topic.replies = [];
+        topic.replies.push({
+          author: currentUser.name,
+          date: 'Chiar acum',
+          content: text
+        });
+        saveTopicsData();
+        input.value = '';
+        showStandaloneToast('Răspunsul tău a fost adăugat!', true);
+        openEmbeddedTopic(currentViewingTopicId);
+        renderEmbeddedTopics();
+      }
+    }
+
+    // Modal helpers
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active-modal');
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active-modal');
+    }
+
+    function openNewPostModal(cat) {
+      if (!currentUser) {
+        showStandaloneToast('Trebuie să fii conectat pentru a posta un topic nou!', false);
+        return;
+      }
+      const authorIn = document.getElementById('authorName');
+      if (authorIn) authorIn.value = currentUser.name;
+      if (cat) {
+        const catSelect = document.getElementById('topicCategory');
+        if (catSelect) catSelect.value = cat;
+      }
+      openModal('newPostModal');
+    }
+
+    function handleCreateTopic(e) {
+      if (e) e.preventDefault();
+      if (!currentUser) return;
+
+      const titleIn = document.getElementById('topicTitle');
+      const catIn = document.getElementById('topicCategory');
+      const contentIn = document.getElementById('topicContent');
+
+      const title = titleIn ? titleIn.value.trim() : '';
+      const category = catIn ? catIn.value : 'regulament-server';
+      const content = contentIn ? contentIn.value.trim() : '';
+
+      if (!title || !content) {
+        showStandaloneToast('Completează titlul și conținutul topicului!', false);
+        return;
+      }
+
+      const newT = {
+        id: Date.now(),
+        category: category,
+        title: title,
+        author: currentUser.name,
+        authorUsername: currentUser.username,
+        date: 'Chiar acum',
+        content: content,
+        views: 1,
+        replies: []
+      };
+
+      liveTopics.unshift(newT);
+      saveTopicsData();
+      renderEmbeddedTopics();
+      closeModal('newPostModal');
+      if (titleIn) titleIn.value = '';
+      if (contentIn) contentIn.value = '';
+      showStandaloneToast('Topic creat cu succes pe forumul BandoPlug!', true);
+    }
+
+    // Category Pill Filter
+    function selectCategoryGroup(group, buttonEl) {
+      currentCategoryGroupFilter = group;
+      document.querySelectorAll('.category-pills .pill').forEach(function(btn) { btn.classList.remove('active'); });
+      if (buttonEl) buttonEl.classList.add('active');
+      filterTopics();
+    }
+
+    function filterTopics() {
+      const query = (document.getElementById('forumSearch') ? document.getElementById('forumSearch').value : '').toLowerCase().trim();
+      let filtered = liveTopics;
+
+      if (currentCategoryGroupFilter !== 'all') {
+        filtered = filtered.filter(function(t) { return t.parentGroup === currentCategoryGroupFilter; });
+      }
+
+      if (query) {
+        filtered = filtered.filter(function(t) {
+          return t.title.toLowerCase().includes(query) || t.content.toLowerCase().includes(query) || t.author.toLowerCase().includes(query);
+        });
+      }
+
+      renderEmbeddedTopics(filtered);
+    }
+
+    // User Dropdown and Profile Navigation
+    function toggleUserDropdown(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('userDropdownMenu');
+      if (menu) menu.classList.toggle('active');
+    }
+
+    function closeUserDropdown() {
+      const menu = document.getElementById('userDropdownMenu');
+      if (menu) menu.classList.remove('active');
+    }
+
+    document.addEventListener('click', function(e) {
+      const wrapper = document.getElementById('authLoggedInUser');
+      if (wrapper && !wrapper.contains(e.target)) {
+        closeUserDropdown();
+      }
+    });
+
+    function switchView(viewName) {
+      if (!currentUser) {
+        const guestView = document.getElementById('view-guest-login');
+        if (guestView) {
+          guestView.style.display = 'block';
+          guestView.classList.add('active-view');
+        }
+        showStandaloneToast('Trebuie să fii conectat pe cont pentru a accesa această secțiune!', false);
+        return;
+      }
+
+      document.querySelectorAll('.app-view').forEach(function(view) {
+        view.classList.remove('active-view');
+        view.style.display = 'none';
+      });
+      document.querySelectorAll('.nav-link').forEach(function(link) {
+        link.classList.remove('active');
+      });
+
+      let targetId = 'view-' + viewName;
+      if (viewName === 'home' || viewName === 'forum') targetId = 'view-forum';
+
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.classList.add('active-view');
+        target.style.display = 'block';
+      }
+
+      const navLink = document.querySelector('.nav-link[href="#' + viewName + '"]');
+      if (navLink) navLink.classList.add('active');
+
+      if (viewName === 'profile') renderProfileView();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderProfileView() {
+      if (!currentUser) return;
+      const nameEl = document.getElementById('profileHeaderName');
+      const avatarEl = document.getElementById('profileHeaderAvatar');
+      const roleEl = document.getElementById('profileHeaderRole');
+      const bioEl = document.getElementById('profileBioText');
+      const joinedEl = document.getElementById('profileJoinedDate');
+      const postsCountEl = document.getElementById('profilePostsCount');
+
+      if (nameEl) nameEl.innerText = currentUser.name;
+      if (avatarEl) avatarEl.src = currentUser.avatar || 'bandoplug.png';
+      if (roleEl) {
+        roleEl.className = currentUser.role === 'owner' ? 'role-badge badge-owner' : 'role-badge badge-dev';
+        roleEl.innerText = currentUser.role === 'owner' ? 'FOUNDER & OWNER' : 'MEMBRU VERIFICAT';
+      }
+      if (bioEl) bioEl.innerText = currentUser.bio || 'Membru oficial BandoPlug RP.';
+      if (joinedEl) joinedEl.innerText = currentUser.joinedDate || 'Astăzi';
+
+      const myTopics = liveTopics.filter(function(t) { return t.authorUsername === currentUser.username || t.author === currentUser.name; });
+      if (postsCountEl) postsCountEl.innerText = myTopics.length;
+
+      const listEl = document.getElementById('profileTopicsList');
+      if (listEl) {
+        if (myTopics.length === 0) {
+          listEl.innerHTML = '<div style="padding: 16px; color: #7d8590; text-align: center;">Nu ai creat niciun topic încă. Folosește butonul "+ Creează Topic" de sus!</div>';
+        } else {
+          listEl.innerHTML = myTopics.map(function(t) {
+            return '<div class="topic-row" style="cursor: pointer;" onclick="openEmbeddedTopic(' + t.id + ')">' +
+              '<div class="topic-details"><h4 style="color:#fff; margin: 0 0 4px 0;">' + t.title + '</h4><div style="color: #7d8590; font-size: 12px;">' + t.date + ' &bull; ' + t.views + ' vizualizări</div></div>' +
+            '</div>';
+          }).join('');
+        }
+      }
+    }
+
+    function openAvatarModal() {
+      openModal('avatarModal');
+    }
+
+    function selectPresetAvatar(src, el) {
+      document.querySelectorAll('.preset-avatar-img').forEach(function(img) { img.classList.remove('selected'); });
+      if (el) el.classList.add('selected');
+      if (currentUser) {
+        currentUser.avatar = src;
+        localStorage.setItem('bandoplug_user_xf', JSON.stringify(currentUser));
+        applyUserSessionToDOM(currentUser);
+        showStandaloneToast('Poza de profil a fost actualizată!', true);
+      }
+    }
+
+    function saveNewAvatar() {
+      const input = document.getElementById('customAvatarUrlInput');
+      if (input && input.value.trim() && currentUser) {
+        currentUser.avatar = input.value.trim();
+        localStorage.setItem('bandoplug_user_xf', JSON.stringify(currentUser));
+        applyUserSessionToDOM(currentUser);
+        showStandaloneToast('Avatar personalizat salvat!', true);
+      }
+      closeModal('avatarModal');
+    }
+
+    function openEditBioModal() {
+      if (!currentUser) return;
+      const nameIn = document.getElementById('editDisplayNameInput');
+      const bioIn = document.getElementById('editBioTextInput');
+      if (nameIn) nameIn.value = currentUser.name;
+      if (bioIn) bioIn.value = currentUser.bio || '';
+      openModal('editBioModal');
+    }
+
+    function handleSaveBio(e) {
+      if (e) e.preventDefault();
+      if (!currentUser) return;
+      const nameIn = document.getElementById('editDisplayNameInput');
+      const bioIn = document.getElementById('editBioTextInput');
+
+      if (nameIn && nameIn.value.trim()) currentUser.name = nameIn.value.trim();
+      if (bioIn) currentUser.bio = bioIn.value.trim();
+
+      localStorage.setItem('bandoplug_user_xf', JSON.stringify(currentUser));
+      applyUserSessionToDOM(currentUser);
+      closeModal('editBioModal');
+      showStandaloneToast('Datele profilului au fost actualizate!', true);
+      renderProfileView();
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      localStorage.removeItem('bandoplug_user_xf');
+      const guestView = document.getElementById('view-guest-login');
+      const forumView = document.getElementById('view-forum');
+      const profileView = document.getElementById('view-profile');
+      const loggedOutBtns = document.getElementById('authLoggedOutBtns');
+      const loggedInUser = document.getElementById('authLoggedInUser');
+
+      if (profileView) profileView.style.display = 'none';
+      if (forumView) forumView.style.display = 'none';
+      if (guestView) {
+        guestView.style.display = 'block';
+        guestView.classList.add('active-view');
+      }
+      if (loggedOutBtns) loggedOutBtns.style.display = 'flex';
+      if (loggedInUser) loggedInUser.style.display = 'none';
+
+      closeUserDropdown();
+      showStandaloneToast('Te-ai deconectat cu succes!', true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function togglePassVisibility(inputId, btn) {
@@ -1855,6 +2149,7 @@
 
     function applyUserSessionToDOM(user) {
       if (!user) return;
+      currentUser = user;
       localStorage.setItem('bandoplug_user_xf', JSON.stringify(user));
 
       const guestView = document.getElementById('view-guest-login');
@@ -1865,6 +2160,7 @@
       const navAvatar = document.getElementById('navUserAvatar');
       const dropdownName = document.getElementById('dropdownName');
       const dropdownTag = document.getElementById('dropdownTag');
+      const dropdownAvatar = document.getElementById('dropdownAvatarImg');
       const dropdownRoleBadge = document.getElementById('dropdownRoleBadge');
       const navAdminLink = document.getElementById('navAdminLink');
       const dropdownAdminLink = document.getElementById('dropdownAdminLink');
@@ -1883,6 +2179,7 @@
 
       if (navUserName) navUserName.innerText = user.name;
       if (navAvatar) navAvatar.src = user.avatar || 'bandoplug.png';
+      if (dropdownAvatar) dropdownAvatar.src = user.avatar || 'bandoplug.png';
       if (dropdownName) dropdownName.innerText = user.name;
       if (dropdownTag) dropdownTag.innerHTML = '<i class="fa-brands fa-discord text-blurple"></i> @' + user.username;
       if (authorInput) {
@@ -2046,6 +2343,6 @@
   </script>
 
   <!-- External App Script -->
-  <script src="app.js?v=7.0"></script>
+  <script src="app.js?v=8.0"></script>
 </body>
 </html>
