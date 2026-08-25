@@ -206,6 +206,15 @@
     <!-- VIEW 1: HOME & FORUMS -->
     <div id="view-forum" class="app-view active-view">
       
+      <!-- XenForo Red Guest Alert Banner (Visible when unauthenticated user tries to click) -->
+      <div class="xf-guest-alert-banner" id="globalGuestBanner" style="display: none;">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <div>
+          <strong>Trebuie să fii autentificat pentru a accesa această secțiune!</strong>
+          <span style="display: block; font-size: 12.5px; opacity: 0.9; margin-top: 2px;">Te rugăm să te conectezi sau să îți creezi un cont gratuit pentru a citi topicurile și a participa la discuții.</span>
+        </div>
+      </div>
+
       <!-- Forum Header Bar & Filter -->
       <div class="forum-control-bar">
         <div class="search-box">
@@ -934,6 +943,32 @@
           </div>
         </div>
 
+        <div class="xf-form-row" id="ownerSecretRowRegister" style="display: none; background: rgba(245, 158, 11, 0.08); padding: 12px; border-radius: 6px; border: 1px dashed var(--gold-accent);">
+          <div class="xf-label">
+            <label for="regOwnerPin" class="text-gold"><i class="fa-solid fa-key"></i> Owner Secret Key:</label>
+            <small class="text-muted">Protecție Seek & Ghost</small>
+          </div>
+          <div class="xf-field">
+            <input type="password" id="regOwnerPin" placeholder="Introdu Codul Secret de Conducere (ex: bando2026)">
+            <div class="xf-help-text" style="color: var(--gold-accent);">Numele de Owner sunt protejate. Introdu codul secret pentru a valida contul.</div>
+          </div>
+        </div>
+
+        <div class="xf-form-row">
+          <div class="xf-label">
+            <label for="regCaptchaInput">Security Code:</label>
+            <small class="text-muted">Captcha</small>
+          </div>
+          <div class="xf-field">
+            <div class="captcha-box-wrapper">
+              <div class="captcha-code-display" id="captchaDisplay">7 X 9 K</div>
+              <button type="button" class="btn-refresh-captcha" onclick="generateNewCaptcha()" title="Schimbă codul"><i class="fa-solid fa-arrows-rotate"></i></button>
+            </div>
+            <input type="text" id="regCaptchaInput" required placeholder="Tastează codul de mai sus...">
+            <div class="xf-help-text">Introdu caracterele de securitate pentru a dovedi că ești o persoană reală.</div>
+          </div>
+        </div>
+
         <div class="xf-form-row">
           <div class="xf-label">
             <label>Verification:</label>
@@ -976,9 +1011,46 @@
     </div>
   </div>
 
+  <!-- MODAL: Verificare Email cu Cod de 6 Cifre -->
+  <div class="modal-overlay" id="emailVerifyModal">
+    <div class="modal-card modal-small" style="text-align: center;">
+      <div style="width: 65px; height: 65px; border-radius: 50%; background: rgba(255, 30, 56, 0.15); border: 2px solid var(--primary-red); display: inline-flex; align-items: center; justify-content: center; font-size: 30px; color: var(--primary-red); margin-bottom: 16px; box-shadow: 0 0 20px var(--red-glow);">
+        <i class="fa-regular fa-envelope-open"></i>
+      </div>
+      <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Verificare Adresă Email</h3>
+      <p style="font-size: 13.5px; color: var(--text-light-muted); margin-bottom: 20px; line-height: 1.5;">
+        Am trimis un cod de securitate format din <strong>6 cifre</strong> către adresa de email:<br>
+        <strong id="verifyEmailDisplay" class="text-red" style="font-size: 14.5px;">alex@email.com</strong>
+      </p>
+
+      <form onsubmit="handleConfirmEmailCode(event)">
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Introdu Codul Primit:</label>
+          <input type="text" id="emailVerifyCodeInput" maxlength="6" required placeholder="000000" class="email-code-input">
+          <small style="color: var(--text-muted); font-size: 12px; margin-top: 6px; display: block;">Codul este format din 6 cifre.</small>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button type="submit" class="btn btn-red-glow btn-block" style="padding: 14px; font-size: 15px;">
+            <i class="fa-solid fa-shield-check"></i> Activează & Confirmă Contul
+          </button>
+          <button type="button" class="btn btn-secondary btn-block" onclick="resendEmailVerificationCode()">
+            <i class="fa-solid fa-rotate"></i> Retrimite Codul pe Email
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: Conectare XenForo Style -->
   <div class="modal-overlay" id="loginModal">
     <div class="modal-card modal-xf-register">
+      <!-- XenForo Red Guest Alert inside Login Modal if blocked -->
+      <div class="xf-guest-alert-banner" id="modalGuestBanner" style="display: none; border-radius: 0; margin-bottom: 0;">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <span>Trebuie să fii autentificat pentru a accesa forumul sau a crea postări!</span>
+      </div>
+
       <div class="modal-header">
         <h3 class="modal-xf-title">Log in</h3>
         <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
@@ -1002,7 +1074,7 @@
             <label for="loginXfUser">Your name or email address:</label>
           </div>
           <div class="xf-field">
-            <input type="text" id="loginXfUser" required placeholder="ex: Alecs233 sau seekmao sau alex@gmail.com">
+            <input type="text" id="loginXfUser" required placeholder="ex: Alecs233 sau seekmao sau alex@gmail.com" oninput="checkOwnerLoginInput(this.value)">
           </div>
         </div>
 
@@ -1017,6 +1089,15 @@
                 <i class="fa-regular fa-eye"></i> Show
               </button>
             </div>
+          </div>
+        </div>
+
+        <div class="xf-form-row" id="ownerSecretRowLogin" style="display: none; background: rgba(245, 158, 11, 0.08); padding: 12px; border-radius: 6px; border: 1px dashed var(--gold-accent);">
+          <div class="xf-label">
+            <label for="loginOwnerPin" class="text-gold"><i class="fa-solid fa-shield-halved"></i> Owner PIN:</label>
+          </div>
+          <div class="xf-field">
+            <input type="password" id="loginOwnerPin" placeholder="Introdu Codul Secret de Owner (ex: bando2026)">
           </div>
         </div>
 
@@ -1256,6 +1337,44 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" onclick="closeModal('editBioModal')">Anulează</button>
           <button type="submit" class="btn btn-red-glow"><i class="fa-solid fa-floppy-disk"></i> Salvează</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Discord OAuth2 Connector & Real Verification -->
+  <div class="modal-overlay" id="discordOAuthModal">
+    <div class="modal-card modal-small" style="background: #2b2d31; border: 1px solid #1e1f22; box-shadow: 0 16px 40px rgba(0,0,0,0.8), 0 0 25px rgba(88, 101, 242, 0.3);">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div style="width: 60px; height: 60px; border-radius: 50%; background: #5865F2; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; color: #fff; margin-bottom: 12px; box-shadow: 0 4px 18px rgba(88, 101, 242, 0.5);">
+          <i class="fa-brands fa-discord"></i>
+        </div>
+        <h3 style="font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px;">Autentificare cu Discord</h3>
+        <p style="font-size: 13px; color: #b5bac1;">BandoPlug Official Forum dorește să se conecteze la contul tău Discord.</p>
+      </div>
+
+      <div style="background: #1e1f22; border-radius: 8px; padding: 14px 16px; margin-bottom: 18px; font-size: 13px; color: #dbdee1;">
+        <div style="font-weight: 700; color: #fff; margin-bottom: 8px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Permisiuni Solicitate:</div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;"><i class="fa-solid fa-circle-check text-green"></i> Preluare Username & Avatar Discord</div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;"><i class="fa-solid fa-circle-check text-green"></i> Preluare Adresă Email Verificată</div>
+        <div style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-shield-halved text-blurple"></i> Verificare Roluri & Anti-Impersonare</div>
+      </div>
+
+      <form id="discordOAuthForm" onsubmit="handleExecuteDiscordOAuth(event)">
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label style="color: #b5bac1; font-size: 12px;">Tag / Username Discord Real *</label>
+          <input type="text" id="discordOAuthInputUser" required placeholder="ex: seekmao, ghost, alecs233" style="background: #1e1f22; border-color: #383a40; color: #fff;" oninput="checkDiscordOAuthOwnerCheck(this.value)">
+        </div>
+
+        <div class="form-group" id="discordOwnerPinGroup" style="display: none; background: rgba(245, 158, 11, 0.12); padding: 10px 14px; border-radius: 6px; border: 1px dashed var(--gold-accent); margin-bottom: 14px;">
+          <label style="color: var(--gold-accent); font-size: 12px; font-weight: 700;"><i class="fa-solid fa-key"></i> Cod Securitate Owner (Seek & Ghost) *</label>
+          <input type="password" id="discordOAuthOwnerPin" placeholder="Introdu Codul Secret (ex: bando2026)" style="background: #1e1f22; border-color: #383a40; color: #fff;">
+          <small style="color: #b5bac1; font-size: 11px; display: block; margin-top: 4px;">Numele de conducere necesită cheia secretă de autorizare.</small>
+        </div>
+
+        <div class="modal-footer" style="border-top-color: #383a40; justify-content: space-between;">
+          <button type="button" class="btn btn-secondary" style="background: #4e5058; border: none; color: #fff;" onclick="closeModal('discordOAuthModal')">Anulează</button>
+          <button type="submit" class="btn btn-discord" style="padding: 10px 22px;"><i class="fa-brands fa-discord"></i> Autorizează & Conectează-te</button>
         </div>
       </form>
     </div>

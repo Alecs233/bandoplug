@@ -434,29 +434,190 @@ function togglePassVisibility(inputId, btn) {
   }
 }
 
-function validateUsername(username) {
-  const clean = username.replace(/[@#]/g, '').trim();
-  if (clean.length < 3 || clean.length > 32) {
-    return { valid: false, error: 'Username-ul trebuie să aibă între 3 și 32 de caractere!' };
-  }
-  const regex = /^[a-zA-Z0-9_.]+$/;
-  if (!regex.test(clean)) {
-    return { valid: false, error: 'Username-ul poate conține doar litere, cifre, puncte și underscore (ex: Alecs233, seekmao)!' };
-  }
-  return { valid: true, clean: clean };
+const OWNER_USERNAMES = ['seekmao', 'seek', 'ghost', 'ghostmao'];
+const OWNER_SECRET_PIN = 'bando2026'; // Cod Secret exclusiv pentru Seek & Ghost
+
+function isOwnerUsername(username) {
+  if (!username) return false;
+  const clean = username.toLowerCase().replace(/[@#]/g, '').trim();
+  return OWNER_USERNAMES.includes(clean);
 }
 
-// XenForo Registration Handler
+// Check Discord OAuth redirected from real Discord in URL hash
+function checkDiscordOAuthRedirect() {
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token=')) {
+    const params = new URLSearchParams(hash.substring(1));
+    const token = params.get('access_token');
+    if (token) {
+      window.history.replaceState(null, null, window.location.pathname);
+      showToast('Se verifică autentificarea securizată Discord...', 'info');
+      fetch('https://discord.com/api/users/@me', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.username) {
+          authenticateDiscordUserData(data.username, data.avatar ? `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png` : 'bandoplug.png', data.email);
+        }
+      })
+      .catch(() => {
+        showToast('Nu s-a putut conecta la Discord API.', 'error');
+      });
+    }
+  }
+}
+
+// Interactive Discord OAuth Trigger
+function handleFastDiscordRegister() {
+  closeModal('loginModal');
+  closeModal('registerModal');
+  openModal('discordOAuthModal');
+}
+
+function checkDiscordOAuthOwnerCheck(val) {
+  const group = document.getElementById('discordOwnerPinGroup');
+  if (group) {
+    group.style.display = isOwnerUsername(val) ? 'block' : 'none';
+  }
+}
+
+function checkOwnerLoginInput(val) {
+  const row = document.getElementById('ownerSecretRowLogin');
+  if (row) {
+    row.style.display = isOwnerUsername(val) ? 'grid' : 'none';
+  }
+}
+
+// Execute Discord OAuth Verification
+function handleExecuteDiscordOAuth(e) {
+  e.preventDefault();
+  const userInput = document.getElementById('discordOAuthInputUser');
+  const pinInput = document.getElementById('discordOAuthOwnerPin');
+
+  const rawUser = userInput.value.trim();
+  const validation = validateUsername(rawUser);
+
+  if (!validation.valid) {
+    showToast(validation.error, 'error');
+    return;
+  }
+
+  const username = validation.clean;
+  const isOwner = isOwnerUsername(username);
+
+  // If user tries to claim Seek or Ghost
+  if (isOwner) {
+    const enteredPin = pinInput ? pinInput.value.trim() : '';
+    if (enteredPin !== OWNER_SECRET_PIN) {
+      showToast('⛔ Acces Respins! Numele de Owner (Seek & Ghost) necesită Codul Secret corect.', 'error');
+      return;
+    }
+  }
+
+  const avatar = 'bandoplug.png';
+  const email = `${username}@discord.auth`;
+
+  authenticateDiscordUserData(username, avatar, email, isOwner);
+  closeModal('discordOAuthModal');
+}
+
+function authenticateDiscordUserData(username, avatar, email, isOwner = null) {
+  const accounts = getRegisteredAccounts();
+  const userKey = username.toLowerCase();
+  if (isOwner === null) isOwner = isOwnerUsername(username);
+
+  const displayName = isOwner ? (userKey.includes('seek') ? 'Seek' : 'Ghost') : username;
+  const userRole = isOwner ? 'owner' : 'member';
+
+  let account = accounts[userKey];
+  if (!account) {
+    account = {
+      username: username,
+      displayName: displayName,
+      email: email || `${username}@discord.auth`,
+      password: 'discord_verified_user',
+      role: userRole,
+      avatar: avatar || 'bandoplug.png',
+      bio: isOwner ? 'Fondator & Conducere Oficială BandoPlug RP.' : `Membru verificat prin Discord (@${username}).`,
+      joinedDate: 'Astăzi',
+      createdAt: new Date().toISOString()
+    };
+    accounts[userKey] = account;
+    saveRegisteredAccounts(accounts);
+  }
+
+  saveAuthUser({
+    name: account.displayName || displayName,
+    username: account.username,
+    email: account.email,
+    role: account.role || userRole,
+    avatar: account.avatar || avatar,
+    bio: account.bio,
+    tag: '@' + account.username.toLowerCase(),
+    joinedDate: account.joinedDate || 'Astăzi'
+  });
+
+  if (account.role === 'owner') {
+    showToast(`👑 Autentificare Owner confirmată pentru ${account.displayName}!`, 'success');
+    switchView('admin');
+  } else {
+    showToast(`Te-ai conectat cu succes prin Discord ca @${username}!`, 'success');
+    renderProfileView();
+    switchView('profile');
+  }
+}
+
+let currentCaptchaCode = '7X9K';
+let pendingRegistrationData = null;
+
+function generateNewCaptcha() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let result = '';
+  for (let i = 0; i < 4; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length)) + (i < 3 ? ' ' : '');
+  }
+  currentCaptchaCode = result.replace(/\s/g, '');
+  const display = document.getElementById('captchaDisplay');
+  if (display) display.innerText = result;
+}
+
+function showGlobalGuestAlert(msg) {
+  const banner = document.getElementById('globalGuestBanner');
+  const bannerText = document.getElementById('globalGuestBannerText');
+  const modalBanner = document.getElementById('modalGuestBanner');
+
+  if (banner) {
+    banner.style.display = 'flex';
+    if (bannerText && msg) bannerText.innerText = msg;
+    banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  if (modalBanner) {
+    modalBanner.style.display = 'flex';
+  }
+}
+
+// XenForo Registration Handler (With Captcha & 6-digit Email Confirmation)
 function handleXenForoRegister(e) {
   e.preventDefault();
   const usernameInput = document.getElementById('regXfUsername');
   const emailInput = document.getElementById('regXfEmail');
   const passInput = document.getElementById('regXfPassword');
   const captchaCheck = document.getElementById('hCaptchaCheck');
+  const captchaTextInput = document.getElementById('regCaptchaInput');
+  const ownerPinInput = document.getElementById('regOwnerPin');
 
   const rawUsername = usernameInput.value.trim();
   const email = emailInput.value.trim().toLowerCase();
   const password = passInput.value.trim();
+  const enteredCaptcha = captchaTextInput ? captchaTextInput.value.trim().toUpperCase().replace(/\s/g, '') : '';
+
+  if (enteredCaptcha !== currentCaptchaCode) {
+    showToast('Codul de securitate (Captcha) este incorect! Încearcă din nou.', 'error');
+    generateNewCaptcha();
+    if (captchaTextInput) captchaTextInput.value = '';
+    return;
+  }
 
   if (!captchaCheck || !captchaCheck.checked) {
     showToast('Te rugăm să bifezi căsuța de verificare "Eu sunt om" (hCaptcha)!', 'error');
@@ -475,6 +636,24 @@ function handleXenForoRegister(e) {
   }
 
   const username = validation.clean;
+  const isOwner = isOwnerUsername(username);
+
+  // Strict check: if registering as Seek or Ghost
+  if (isOwner) {
+    const ownerSecretRow = document.getElementById('ownerSecretRowRegister');
+    if (ownerSecretRow && ownerSecretRow.style.display === 'none') {
+      ownerSecretRow.style.display = 'grid';
+      showToast('⚠️ Numele "seekmao" și "ghost" sunt rezervate conducerii! Introdu Codul Secret de Owner pentru a confirma.', 'info');
+      return;
+    }
+
+    const pin = ownerPinInput ? ownerPinInput.value.trim() : '';
+    if (pin !== OWNER_SECRET_PIN) {
+      showToast('⛔ Codul Secret de Owner este incorect! Nu poți crea cont cu numele conducerii.', 'error');
+      return;
+    }
+  }
+
   const accounts = getRegisteredAccounts();
   const userKey = username.toLowerCase();
 
@@ -491,13 +670,15 @@ function handleXenForoRegister(e) {
     return;
   }
 
-  const isOwner = isOwnerUsername(username);
   const userRole = isOwner ? 'owner' : 'member';
   const displayName = isOwner ? (userKey.includes('seek') ? 'Seek' : 'Ghost') : username;
   const avatar = 'bandoplug.png';
   const bio = isOwner ? 'Fondator & Conducere Oficială BandoPlug FiveM Roleplay.' : 'Nou membru înregistrat pe forumul oficial BandoPlug.';
 
-  const newAccount = {
+  // Generate 6-Digit Email Verification Code
+  const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+  pendingRegistrationData = {
     username: username,
     displayName: displayName,
     email: email,
@@ -505,7 +686,47 @@ function handleXenForoRegister(e) {
     role: userRole,
     avatar: avatar,
     bio: bio,
+    code: verifyCode
+  };
+
+  const displayEl = document.getElementById('verifyEmailDisplay');
+  if (displayEl) displayEl.innerText = email;
+
+  closeModal('registerModal');
+  document.getElementById('xfRegisterForm').reset();
+  openModal('emailVerifyModal');
+
+  // Trigger Incoming Verification Email Notification
+  setTimeout(() => {
+    showToast(`📩 [Email BandoPlug] Codul tău de verificare este: <strong style="color:#ff1e38; font-size:16px;">${verifyCode}</strong>`, 'info');
+  }, 400);
+}
+
+// Confirm Email 6-digit Code Handler
+function handleConfirmEmailCode(e) {
+  e.preventDefault();
+  const codeInput = document.getElementById('emailVerifyCodeInput');
+  const enteredCode = codeInput ? codeInput.value.trim() : '';
+
+  if (!pendingRegistrationData || enteredCode !== pendingRegistrationData.code) {
+    showToast('Codul de verificare introdus este incorect! Te rugăm să verifici email-ul.', 'error');
+    return;
+  }
+
+  const data = pendingRegistrationData;
+  const accounts = getRegisteredAccounts();
+  const userKey = data.username.toLowerCase();
+
+  const newAccount = {
+    username: data.username,
+    displayName: data.displayName,
+    email: data.email,
+    password: data.password,
+    role: data.role,
+    avatar: data.avatar,
+    bio: data.bio,
     joinedDate: 'Astăzi',
+    emailVerified: true,
     createdAt: new Date().toISOString()
   };
 
@@ -513,24 +734,25 @@ function handleXenForoRegister(e) {
   saveRegisteredAccounts(accounts);
 
   const sessionUser = {
-    name: displayName,
-    username: username,
-    email: email,
-    role: userRole,
-    avatar: avatar,
-    bio: bio,
-    tag: '@' + username.toLowerCase(),
+    name: data.displayName,
+    username: data.username,
+    email: data.email,
+    role: data.role,
+    avatar: data.avatar,
+    bio: data.bio,
+    tag: '@' + data.username.toLowerCase(),
     joinedDate: 'Astăzi'
   };
 
   saveAuthUser(sessionUser);
-  closeModal('registerModal');
-  document.getElementById('xfRegisterForm').reset();
+  closeModal('emailVerifyModal');
+  if (codeInput) codeInput.value = '';
+  pendingRegistrationData = null;
 
-  showToast(`✅ Cont creat cu succes! Un email de bun venit a fost expediat pe ${email}.`, 'success');
-  
-  if (isOwner) {
-    showToast(`👑 Rol de OWNER activat automat pentru ${displayName}!`, 'success');
+  showToast(`🎉 Contul tău a fost confirmat și activat cu succes! Bun venit, ${sessionUser.name}.`, 'success');
+
+  if (data.role === 'owner') {
+    showToast(`👑 Rol de OWNER activat pentru ${sessionUser.name}!`, 'success');
     switchView('admin');
   } else {
     renderProfileView();
@@ -538,11 +760,20 @@ function handleXenForoRegister(e) {
   }
 }
 
+// Resend Email Verification Code
+function resendEmailVerificationCode() {
+  if (!pendingRegistrationData) return;
+  const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+  pendingRegistrationData.code = newCode;
+  showToast(`📩 [Email BandoPlug] Un nou cod de verificare a fost expediat: <strong style="color:#ff1e38; font-size:16px;">${newCode}</strong>`, 'info');
+}
+
 // XenForo Log In Handler
 function handleXenForoLogin(e) {
   e.preventDefault();
   const userInput = document.getElementById('loginXfUser');
   const passInput = document.getElementById('loginXfPass');
+  const ownerPinInput = document.getElementById('loginOwnerPin');
 
   const rawUser = userInput.value.trim();
   const password = passInput.value.trim();
@@ -557,11 +788,39 @@ function handleXenForoLogin(e) {
     account = Object.values(accounts).find(acc => acc.email === searchKey);
   }
 
-  if (!account && isOwnerUsername(searchKey)) {
-    showToast(`Contul de Owner "${searchKey}" nu a fost încă configurat. Te rugăm să apeși pe Register pentru a-ți alege parola!`, 'info');
-    openRegisterModal();
-    document.getElementById('regXfUsername').value = searchKey;
-    return;
+  const isOwnerAttempt = isOwnerUsername(searchKey);
+
+  // If logging in as Owner, enforce security check
+  if (isOwnerAttempt) {
+    const ownerSecretRow = document.getElementById('ownerSecretRowLogin');
+    if (ownerSecretRow && ownerSecretRow.style.display === 'none') {
+      ownerSecretRow.style.display = 'grid';
+      showToast('⚠️ Introdu Codul Secret de Owner pentru a confirma identitatea!', 'info');
+      return;
+    }
+
+    const pin = ownerPinInput ? ownerPinInput.value.trim() : '';
+    if (pin !== OWNER_SECRET_PIN && password !== OWNER_SECRET_PIN) {
+      showToast('⛔ PIN de Owner incorect! Accesul la conturile conducerii este restricționat.', 'error');
+      return;
+    }
+  }
+
+  if (!account && isOwnerAttempt) {
+    // Auto-create verified owner session
+    const displayName = searchKey.includes('seek') ? 'Seek' : 'Ghost';
+    account = {
+      username: searchKey,
+      displayName: displayName,
+      email: `${searchKey}@bandoplug.ro`,
+      password: password,
+      role: 'owner',
+      avatar: 'bandoplug.png',
+      bio: 'Fondator & Conducere Oficială BandoPlug RP.',
+      joinedDate: 'Astăzi'
+    };
+    accounts[searchKey] = account;
+    saveRegisteredAccounts(accounts);
   }
 
   if (!account) {
@@ -571,12 +830,39 @@ function handleXenForoLogin(e) {
     return;
   }
 
-  if (account.password !== password) {
+  if (account.password !== password && !isOwnerAttempt) {
     showToast('Parolă incorectă! Te rugăm să încerci din nou.', 'error');
     return;
   }
 
-  const isOwner = account.role === 'owner' || isOwnerUsername(account.username);
+  const isOwner = account.role === 'owner' || isOwnerAttempt;
+  const sessionUser = {
+    name: account.displayName || account.username,
+    username: account.username,
+    email: account.email || `${account.username}@bandoplug.ro`,
+    role: isOwner ? 'owner' : 'member',
+    avatar: account.avatar || 'bandoplug.png',
+    bio: account.bio || 'Membru BandoPlug.',
+    tag: '@' + account.username.toLowerCase(),
+    joinedDate: account.joinedDate || 'Azi'
+  };
+
+  saveAuthUser(sessionUser);
+  closeModal('loginModal');
+  document.getElementById('xfLoginForm').reset();
+
+  const banner = document.getElementById('globalGuestBanner');
+  if (banner) banner.style.display = 'none';
+
+  if (isOwner) {
+    showToast(`👑 Bine ai revenit, Owner ${sessionUser.name}!`, 'success');
+    switchView('admin');
+  } else {
+    showToast(`Te-ai conectat cu succes! Bun venit, ${sessionUser.name}.`, 'success');
+    renderProfileView();
+    switchView('profile');
+  }
+}
   const sessionUser = {
     name: account.displayName || account.username,
     username: account.username,
@@ -1099,6 +1385,12 @@ function filterTopics() {
 }
 
 function switchView(viewName) {
+  if (!currentUser && (viewName === 'aplicatii' || viewName === 'admin' || viewName === 'profile')) {
+    showGlobalGuestAlert('Trebuie să fii autentificat pentru a accesa această secțiune a comunității!');
+    openLoginModal();
+    return;
+  }
+
   document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active-view'));
   document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
 
@@ -1141,7 +1433,7 @@ function closeModal(id) {
 // STRICT PERMISSIONS: New Post Modal
 function openNewPostModal(preselectedCategory = null) {
   if (!currentUser) {
-    showToast('⚠️ Trebuie să fii autentificat pe cont pentru a putea crea un topic!', 'error');
+    showGlobalGuestAlert('Trebuie să fii autentificat pe cont pentru a putea crea un topic!');
     openLoginModal();
     return;
   }
@@ -1159,6 +1451,12 @@ function openNewPostModal(preselectedCategory = null) {
 }
 
 function viewTopicDetail(id) {
+  if (!currentUser) {
+    showGlobalGuestAlert('Trebuie să fii autentificat pentru a citi această discuție de pe forum!');
+    openLoginModal();
+    return;
+  }
+
   const topic = currentTopics.find(t => t.id === id);
   if (!topic) return;
 

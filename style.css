@@ -1441,6 +1441,87 @@ a {
   color: #7d8590;
 }
 
+/* XenForo Style Guest Block Alert Banner */
+.xf-guest-alert-banner {
+  background: #670b14;
+  border: 1px solid #ff1e38;
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14.5px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(255, 30, 56, 0.3);
+  animation: shakeAlert 0.4s ease;
+}
+
+@keyframes shakeAlert {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+.xf-guest-alert-banner i {
+  font-size: 22px;
+  color: #ff4d63;
+}
+
+/* Captcha styling */
+.captcha-box-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.captcha-code-display {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1b212d, #0d1016);
+  border: 1px dashed #404b5c;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: #ff3b53;
+  text-shadow: 0 0 10px rgba(255, 30, 56, 0.4);
+  user-select: none;
+}
+
+.btn-refresh-captcha {
+  background: #1f2532;
+  border: 1px solid #364052;
+  color: #a0aec0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-refresh-captcha:hover {
+  color: #fff;
+  background: #2b3445;
+}
+
+/* Email 6-digit verification code styling */
+.email-code-input {
+  font-size: 26px !important;
+  letter-spacing: 10px !important;
+  text-align: center !important;
+  font-weight: 800 !important;
+  font-family: monospace !important;
+  background: #0d1017 !important;
+  border: 2px solid var(--primary-red) !important;
+  box-shadow: 0 0 16px rgba(255, 30, 56, 0.3) !important;
+  padding: 12px !important;
+}
+
 .xf-terms-checkbox {
   display: flex;
   align-items: center;
