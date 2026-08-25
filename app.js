@@ -1,12 +1,14 @@
 /**
- * BandoPlug Community & Forum - XenForo Engine, Real Auth, Email & Profiles
+ * BandoPlug Community & Forum - XenForo Engine, Strict Permissions & Full Categories
  */
 
-// Initial Seed Topics for FiveM & Community Forum
+// Initial Seed Topics for BandoPlug FiveM Hierarchy
 const INITIAL_TOPICS = [
+  // 1. Server Information
   {
     id: 1,
     category: 'anunturi',
+    parentGroup: 'server-info',
     title: '🔥 [DESCHIDERE] BandoPlug v2.0 - Noua Eră a Roleplay-ului Românesc',
     author: 'Seek',
     authorUsername: 'seekmao',
@@ -31,108 +33,253 @@ Vă așteptăm pe server! Pentru probleme sau suport, folosiți canalul nostru d
   },
   {
     id: 2,
-    category: 'anunturi',
-    title: '📋 [GHID] Ghidul Începătorului & Cum să te Conectezi pe Server',
+    category: 'regulament-server',
+    parentGroup: 'server-info',
+    title: '📜 [REGULAMENT] Regulamentul Oficial al Serverului BandoPlug FiveM',
     author: 'Ghost',
     authorUsername: 'ghost',
     date: 'Ieri la 18:00',
-    content: `Pentru a vă conecta pe serverul BandoPlug FiveM:
-1. Deschideți FiveM și apăsați tasta F8
-2. Tastați comanda: connect play.bandoplug.ro
-3. Asigurați-vă că aveți contul de Discord și Steam deschise în fundal
-4. Citiți cu atenție regulamentul din secțiunea dedicată de pe forum înainte de a începe roleplay-ul!`,
+    content: `Regulamentul oficial BandoPlug Roleplay:
+1. Păstrarea caracterului (In Character) este obligatorie în orice moment pe server.
+2. RDM (Random Deathmatch) și VDM (Vehicle Deathmatch) sunt strict interzise și se pedepsesc cu Ban Permanent.
+3. Este obligatoriu să respectați Fear RP când viața personajului vă este pusă în pericol direct.
+4. MetaGaming (MG) și PowerGaming (PG) atrag sancțiuni aspre.
+5. Respectați toți jucătorii și membrii echipei Staff.`,
     views: 890,
     pinned: true,
     replies: [
-      { author: 'Speedy_RP', authorUsername: 'speedy', date: 'Ieri la 19:20', content: 'Foarte util pentru cei noi, mulțumim!' }
+      { author: 'Speedy_RP', authorUsername: 'speedy', date: 'Ieri la 19:20', content: 'Foarte clar explicat, respectat de toată lumea!' }
     ]
   },
   {
     id: 3,
-    category: 'generale',
-    title: '📸 [MEDIA] Poze și Momente Memorabile de pe Server',
-    author: 'StreetKing',
-    authorUsername: 'streetking',
-    date: 'Astăzi la 09:15',
-    content: `Postați aici cele mai tari screenshot-uri, clipuri de la urmăriri sau roleplay cinematic pe care le-ați făcut pe BandoPlug! Respectați bunul simț și nu postați conținut toxic.`,
-    views: 310,
+    category: 'ghid-rp',
+    parentGroup: 'server-info',
+    title: '📘 [GHID] Ghid Roleplay pentru Începători & Comenzi Esențiale (/me, /do)',
+    author: 'Kroxx',
+    authorUsername: 'kroxx',
+    date: 'Ieri la 16:40',
+    content: `Cum se folosesc comenzile de Roleplay corect:
+- **/me** descrie o acțiune a personajului (ex: /me scoate portofelul din buzunar și numără banii).
+- **/do** descrie starea sau mediul înconjurător (ex: /do actele sunt în torpedoul mașinii?).
+Nu folosiți /do pentru a forța decizii asupra altor jucători (PowerGaming)!`,
+    views: 640,
     pinned: false,
     replies: [
-      { author: 'GhostRider', authorUsername: 'ghostrider', date: 'Astăzi la 09:40', content: 'O să postez câteva cadre de la ultimul car meet în seara asta!' }
+      { author: 'Alex_Plug', authorUsername: 'alex_plug', date: 'Ieri la 17:00', content: 'Util pentru oricine vrea să facă RP calitativ!' }
     ]
   },
   {
     id: 4,
-    category: 'ganguri',
-    title: '💀 [GANG] Aplicație Înregistrare Gang - "Northside Hustlers"',
-    author: 'Lil_Bando',
-    authorUsername: 'lil_bando',
-    date: 'Astăzi la 08:50',
-    content: `Numele Gang-ului: Northside Hustlers
-Lider: Marcus 'Bando' Taylor
-Membri Activi: 7
-Teritoriu Solicitat: Davis
-Lore: O grupare apărută în cartierele din sud dedicate protecției locale.`,
-    views: 245,
+    category: 'server-showcase',
+    parentGroup: 'server-info',
+    title: '🎥 [SHOWCASE] Prezentare Sisteme Custom: Garaje, Tuning & Carteluri',
+    author: 'Seek',
+    authorUsername: 'seekmao',
+    date: '2 zile în urmă',
+    content: `Am pregătit un mic showcase cu noile sisteme implementate exclusiv pe BandoPlug:
+- Sistem de tuning dinamic cu sunete motor reale
+- Camere de supraveghere live pentru LSPD
+- Telefoane mobile inteligente cu apeluri video și aplicații bancare securizate!`,
+    views: 1120,
     pinned: false,
-    replies: [
-      { author: 'Seek', authorUsername: 'seekmao', date: 'Astăzi la 10:15', content: 'Aplicație luată în considerare. Vă așteptăm pe Discord la camera de testare gang-uri.' }
-    ]
+    replies: []
   },
   {
     id: 5,
-    category: 'departamente',
-    title: '🚔 [LSPD] Regulament Intern și Conduită Departamentală',
+    category: 'aplicatii-staff',
+    parentGroup: 'server-info',
+    title: '🛡️ [RECRUTARE] Aplicații Deschise pentru Echipa Staff / Helper',
+    author: 'Ghost',
+    authorUsername: 'ghost',
+    date: '2 zile în urmă',
+    content: `Căutăm persoane mature, calme și dedicate pentru a se alătura echipei Staff BandoPlug!
+Cerințe minime:
+- Vârsta minimă: 16 ani
+- Activitate zilnică de minim 3-4 ore
+- Cunoașterea perfectă a regulamentului
+Trimiteți aplicația din secțiunea dedicată de pe site!`,
+    views: 750,
+    pinned: true,
+    replies: []
+  },
+
+  // 2. In Character (IC)
+  {
+    id: 6,
+    category: 'screenshots-gallery',
+    parentGroup: 'in-character',
+    title: '📸 [MEDIA] Poze și Momente Memorabile de la Ultimul Car Meet în Los Santos',
+    author: 'StreetKing',
+    authorUsername: 'streetking',
+    date: 'Astăzi la 09:15',
+    content: `Câteva cadre senzaționale de aseară din parcarea de la Legion Square! Peste 30 de mașini modificate și roleplay curat. Postați și voi pozele voastre aici!`,
+    views: 310,
+    pinned: false,
+    replies: [
+      { author: 'GhostRider', authorUsername: 'ghostrider', date: 'Astăzi la 09:40', content: 'Super atmosfera, ne vedem și diseară!' }
+    ]
+  },
+  {
+    id: 7,
+    category: 'povesti-character',
+    parentGroup: 'in-character',
+    title: '📖 [LORE] Povestea lui Marcus Vance - De pe străzile din Davis la Los Santos',
+    author: 'Marcus_V',
+    authorUsername: 'marcus_v',
+    date: 'Ieri la 12:10',
+    content: `Născut în cartierul Davis, Marcus a învățat de mic regulile străzii. După ce a lucrat câțiva ani ca mecanic la un atelier local, a decis să își deschidă propria afacere alături de prietenii săi din copilărie...`,
+    views: 280,
+    pinned: false,
+    replies: []
+  },
+  {
+    id: 8,
+    category: 'business-ic',
+    parentGroup: 'in-character',
+    title: '💼 [AFACERE] Deschiderea Service-ului Auto & Tuning "Bando Customs"',
+    author: 'BandoMechanic',
+    authorUsername: 'bandomechanic',
+    date: 'Ieri la 14:00',
+    content: `Vă așteptăm zilnic între orele 14:00 - 02:00 la Bando Customs pentru:
+- Schimb ulei și reparații complete caroserie
+- Upgrade performanță (Motor, Turbo, Frâne de curse)
+- Vopsitorie custom și folii geamuri. Oferim garanție pentru toate lucrările!`,
+    views: 420,
+    pinned: false,
+    replies: [
+      { author: 'Speedy_RP', authorUsername: 'speedy', date: 'Ieri la 15:30', content: 'Cea mai bună echipă de mecanici din oraș!' }
+    ]
+  },
+
+  // 3. Facțiuni Legale
+  {
+    id: 9,
+    category: 'guvern-reports',
+    parentGroup: 'factiuni-legale',
+    title: '🏛️ [GUVERN] Model Oficial Rapoarte de Activitate & Ședințe Guvernamentale',
+    author: 'Governor_Vance',
+    authorUsername: 'gov_vance',
+    date: '3 zile în urmă',
+    content: `Toate departamentele legale au obligația de a depune raportul săptămânal de activitate până duminică la ora 20:00. Fondurile bugetare vor fi alocate în funcție de performanță.`,
+    views: 390,
+    pinned: true,
+    replies: []
+  },
+  {
+    id: 10,
+    category: 'lspd',
+    parentGroup: 'factiuni-legale',
+    title: '🚔 [LSPD] Regulament Intern și Conduită Departamentală LSPD',
     author: 'Chief_Miller',
     authorUsername: 'chief_miller',
     date: '2 zile în urmă',
-    content: `Toți ofițerii de poliție activi din cadrul Los Santos Police Department au obligația de a purta stația radio pe frecvența 1 și de a respecta codul 10-4 în timpul patrulelor.`,
-    views: 450,
+    content: `Toți ofițerii de poliție activi din cadrul Los Santos Police Department au obligația de a purta stația radio pe frecvența 1 și de a respecta codul 10-4 în timpul patrulelor. Mențineți un Roleplay exemplar.`,
+    views: 520,
     pinned: true,
     replies: [
       { author: 'Officer_Smith', authorUsername: 'smith', date: '2 zile în urmă', content: 'Am luat la cunoștință. 10-4!' }
     ]
   },
   {
-    id: 6,
-    category: 'rapoarte',
-    title: '⚠️ [RECLAMAȚIE] Model Oficial pentru Reclamație Jucător / Staff',
-    author: 'Alex_Plug',
-    authorUsername: 'alex_plug',
+    id: 11,
+    category: 'ems',
+    parentGroup: 'factiuni-legale',
+    title: '🚑 [EMS] Protocol Medical de Urgență & Recrutări Medici Spital Pillbox',
+    author: 'Dr_Elena',
+    authorUsername: 'dr_elena',
+    date: '2 zile în urmă',
+    content: `Departamentul Medical din Los Santos recrutează paramedici și medici rezidenți. Salariu atractiv, program flexibil și echipament modern. Aplicați pe forum!`,
+    views: 460,
+    pinned: false,
+    replies: []
+  },
+
+  // 4. Gang-uri & Ilegale
+  {
+    id: 12,
+    category: 'ganguri-non-oficiale',
+    parentGroup: 'ganguri',
+    title: '💀 [GANG] Prezentare Gruparea "Southside Hustlers" - Davis Bloc',
+    author: 'Lil_Bando',
+    authorUsername: 'lil_bando',
+    date: 'Astăzi la 08:50',
+    content: `Numele Grupării: Southside Hustlers
+Lider: Marcus 'Bando' Taylor
+Membri Activi: 6
+Teritoriu: Davis
+Obiectiv: Protejarea cartierului și afaceri locale de stradă.`,
+    views: 340,
+    pinned: false,
+    replies: [
+      { author: 'Seek', authorUsername: 'seekmao', date: 'Astăzi la 10:15', content: 'Succes cu gruparea! Respectați regulamentul ilegal.' }
+    ]
+  },
+  {
+    id: 13,
+    category: 'ganguri-oficiale',
+    parentGroup: 'ganguri',
+    title: '👑 [CARTEL OFICIAL] Cartelul "La Familia" - Regulament Teritorii & Conduită',
+    author: 'Don_Salieri',
+    authorUsername: 'don_salieri',
     date: '3 zile în urmă',
-    content: `Pentru ca o reclamație să fie validă, trebuie să conțineți:
-- Numele dvs. IC:
-- ID-ul jucătorului reclamat:
-- Ora și data incidentului:
-- Regula încălcată (RDM, VDM, FailRP, etc.):
-- Dovadă video clară:`,
-    views: 520,
+    content: `Statut oficial confirmat de conducere. Teritoriu controlat: Vinewood Hills & Port. Orice intrare neautorizată în zonă se taxează conform legilor cartelului.`,
+    views: 710,
     pinned: true,
     replies: []
   },
   {
-    id: 7,
-    category: 'sugestii',
-    title: '💡 [SUGESTIE] Adăugare sistem de pescuit sportiv și concursuri pe weekend',
-    author: 'Fisherman_Dan',
-    authorUsername: 'fisherman',
-    date: 'Ieri la 14:30',
-    content: `Ar fi foarte mișto dacă s-ar adăuga un job secundar de pescuit cu momeli diferite și un clasament săptămânal cu premii în bani IC!`,
-    views: 180,
-    pinned: false,
+    id: 14,
+    category: 'cerere-gang',
+    parentGroup: 'ganguri',
+    title: '📝 [MODEL] Model Oficial Cerere Înregistrare Gang / Facțiune Ilegală',
+    author: 'Ghost',
+    authorUsername: 'ghost',
+    date: '3 zile în urmă',
+    content: `Modelul obligatoriu pentru cerere gang:
+1. Nume Gang & Culoare:
+2. Nume Lider (IC & Discord):
+3. Poveste & Istoric (Lore min. 100 cuvinte):
+4. Membri inițiali (Minim 5):
+5. Teritoriu solicitat:`,
+    views: 620,
+    pinned: true,
+    replies: []
+  },
+  {
+    id: 15,
+    category: 'ghid-gang',
+    parentGroup: 'ganguri',
+    title: '📕 [GHID] Ghid Complet Gang Roleplay: Jafuri, Războaie & Inițieri',
+    author: 'Seek',
+    authorUsername: 'seekmao',
+    date: '3 zile în urmă',
+    content: `Reguli esențiale pentru facțiunile ilegale:
+- Jafurile de bancă și magazin necesită minim 3 polițiști activi pe server.
+- Războaiele de gang se anunță cu minim 2 ore înainte pe Discord.
+- Respectați Fear RP și Roleplay-ul de frică atunci când sunteți ostatici!`,
+    views: 890,
+    pinned: true,
     replies: [
-      { author: 'Kroxx', authorUsername: 'kroxx', date: 'Ieri la 16:00', content: 'Idee foarte bună, o avem deja în plan pentru update-ul v2.1!' },
-      { author: 'Seek', authorUsername: 'seekmao', date: 'Ieri la 16:45', content: '+1, aprobat!' }
+      { author: 'Kroxx', authorUsername: 'kroxx', date: '3 zile în urmă', content: 'Lectură obligatorie pentru toți membrii ilegali.' }
     ]
   }
+];
+
+// All category IDs list
+const ALL_CATEGORIES = [
+  'regulament-server', 'ghid-rp', 'server-showcase', 'anunturi', 'aplicatii-staff',
+  'screenshots-gallery', 'povesti-character', 'business-ic',
+  'guvern-reports', 'lspd', 'ems',
+  'ganguri-non-oficiale', 'ganguri-oficiale', 'cerere-gang', 'ghid-gang'
 ];
 
 // State
 let currentTopics = [];
 let currentApplications = [];
-let currentCategoryFilter = 'all';
+let currentCategoryGroupFilter = 'all';
 let currentViewingTopicId = null;
-let currentUser = null; // { name, username, email, role, avatar, bio, tag, messagesCount, reactionsCount, pointsCount, joinedDate }
+let currentUser = null;
 let selectedTempAvatar = 'bandoplug.png';
 
 // Init
@@ -221,8 +368,6 @@ function updateAuthUI() {
       }
       if (navAdminLink) navAdminLink.style.display = 'flex';
       if (dropdownAdminLink) dropdownAdminLink.style.display = 'flex';
-      if (authorInput) authorInput.value = currentUser.name;
-      if (replyAuthorInput) replyAuthorInput.value = currentUser.name;
     } else {
       if (dropBadge) {
         dropBadge.className = 'role-badge badge-dev';
@@ -230,8 +375,15 @@ function updateAuthUI() {
       }
       if (navAdminLink) navAdminLink.style.display = 'none';
       if (dropdownAdminLink) dropdownAdminLink.style.display = 'none';
-      if (authorInput) authorInput.value = currentUser.name;
-      if (replyAuthorInput) replyAuthorInput.value = currentUser.name;
+    }
+
+    if (authorInput) {
+      authorInput.value = currentUser.name;
+      authorInput.readOnly = true;
+    }
+    if (replyAuthorInput) {
+      replyAuthorInput.value = currentUser.name;
+      replyAuthorInput.readOnly = true;
     }
   } else {
     if (loggedOutGroup) loggedOutGroup.style.display = 'flex';
@@ -270,7 +422,6 @@ function openRegisterModal() {
   openModal('registerModal');
 }
 
-// Toggle password visibility
 function togglePassVisibility(inputId, btn) {
   const input = document.getElementById(inputId);
   if (!input) return;
@@ -283,7 +434,6 @@ function togglePassVisibility(inputId, btn) {
   }
 }
 
-// Validate Discord Username
 function validateUsername(username) {
   const clean = username.replace(/[@#]/g, '').trim();
   if (clean.length < 3 || clean.length > 32) {
@@ -335,7 +485,6 @@ function handleXenForoRegister(e) {
     return;
   }
 
-  // Check if email already used
   const emailExists = Object.values(accounts).some(acc => acc.email === email);
   if (emailExists) {
     showToast(`Adresa de email "${email}" este deja asociată unui cont!`, 'error');
@@ -403,13 +552,11 @@ function handleXenForoLogin(e) {
   const accounts = getRegisteredAccounts();
   const searchKey = rawUser.toLowerCase().replace(/[@#]/g, '').trim();
 
-  // Search by username or email
   let account = accounts[searchKey];
   if (!account) {
     account = Object.values(accounts).find(acc => acc.email === searchKey);
   }
 
-  // If it's an owner trying to login for the first time without having registered
   if (!account && isOwnerUsername(searchKey)) {
     showToast(`Contul de Owner "${searchKey}" nu a fost încă configurat. Te rugăm să apeși pe Register pentru a-ți alege parola!`, 'info');
     openRegisterModal();
@@ -727,9 +874,9 @@ function handleSaveBio(e) {
   showToast('Profilul a fost salvat!', 'success');
 }
 
-// Topics & Forum
+// Topics & Forum Data
 function loadTopics() {
-  const saved = localStorage.getItem('bandoplug_topics_xf');
+  const saved = localStorage.getItem('bandoplug_topics_v5_hierarchy');
   if (saved) {
     try {
       currentTopics = JSON.parse(saved);
@@ -743,7 +890,7 @@ function loadTopics() {
 }
 
 function saveTopics() {
-  localStorage.setItem('bandoplug_topics_xf', JSON.stringify(currentTopics));
+  localStorage.setItem('bandoplug_topics_v5_hierarchy', JSON.stringify(currentTopics));
 }
 
 function loadApplications() {
@@ -832,54 +979,55 @@ function ownerDeleteApp(appId) {
   showToast('Aplicație ștearsă din listă.', 'info');
 }
 
+// Render topics into categories
 function renderTopics(filteredList = null) {
   const listToRender = filteredList || currentTopics;
-  const categories = ['anunturi', 'generale', 'ganguri', 'departamente', 'rapoarte', 'sugestii'];
 
-  categories.forEach(cat => {
+  ALL_CATEGORIES.forEach(cat => {
     const container = document.getElementById(`list-${cat}`);
     if (!container) return;
 
     const groupCard = container.closest('.forum-section-card');
     const catTopics = listToRender.filter(t => t.category === cat);
 
-    if (currentCategoryFilter !== 'all' && currentCategoryFilter !== cat) {
-      if (groupCard) groupCard.style.display = 'none';
-      return;
-    } else {
-      if (groupCard) groupCard.style.display = 'block';
-    }
-
     if (catTopics.length === 0) {
       container.innerHTML = `
-        <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;">
-          <i class="fa-solid fa-inbox" style="font-size: 24px; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
-          Nu există discuții active în această categorie momentan.
+        <div style="padding: 16px 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
+          Nu există discuții active în această categorie. Fii primul care deschide un topic!
         </div>
       `;
-      return;
-    }
-
-    container.innerHTML = catTopics.map(topic => `
-      <div class="topic-row" onclick="viewTopicDetail(${topic.id})">
-        <div class="topic-icon"><i class="fa-solid ${getCategoryIcon(topic.category)}"></i></div>
-        <div class="topic-details">
-          <h4>
-            ${topic.pinned ? '<span class="badge-pinned"><i class="fa-solid fa-thumbtack"></i> PINNED</span>' : ''}
-            ${escapeHtml(topic.title)}
-          </h4>
-          <div class="topic-meta">
-            <span><i class="fa-solid fa-user text-red"></i> ${escapeHtml(topic.author)}</span>
-            <span><i class="fa-regular fa-clock"></i> ${escapeHtml(topic.date)}</span>
-            <span><i class="fa-regular fa-eye"></i> ${topic.views} vizualizări</span>
+    } else {
+      container.innerHTML = catTopics.map(topic => `
+        <div class="topic-row" onclick="viewTopicDetail(${topic.id})">
+          <div class="topic-icon"><i class="fa-solid ${getCategoryIcon(topic.category)}"></i></div>
+          <div class="topic-details">
+            <h4>
+              ${topic.pinned ? '<span class="badge-pinned"><i class="fa-solid fa-thumbtack"></i> PINNED</span>' : ''}
+              ${escapeHtml(topic.title)}
+            </h4>
+            <div class="topic-meta">
+              <span><i class="fa-solid fa-user text-red"></i> ${escapeHtml(topic.author)}</span>
+              <span><i class="fa-regular fa-clock"></i> ${escapeHtml(topic.date)}</span>
+              <span><i class="fa-regular fa-eye"></i> ${topic.views} vizualizări</span>
+            </div>
+          </div>
+          <div class="topic-stats">
+            <div class="topic-stat-box"><strong>${topic.replies ? topic.replies.length : 0}</strong><small>Răspunsuri</small></div>
+            <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 12px;"></i>
           </div>
         </div>
-        <div class="topic-stats">
-          <div class="topic-stat-box"><strong>${topic.replies ? topic.replies.length : 0}</strong><small>Răspunsuri</small></div>
-          <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 12px;"></i>
-        </div>
-      </div>
-    `).join('');
+      `).join('');
+    }
+  });
+
+  // Handle category group visibility
+  document.querySelectorAll('.category-group-block').forEach(block => {
+    const parent = block.getAttribute('data-parent-group');
+    if (currentCategoryGroupFilter === 'all' || currentCategoryGroupFilter === parent) {
+      block.style.display = 'flex';
+    } else {
+      block.style.display = 'none';
+    }
   });
 
   updateStats();
@@ -888,17 +1036,48 @@ function renderTopics(filteredList = null) {
 function getCategoryIcon(cat) {
   switch (cat) {
     case 'anunturi': return 'fa-bullhorn';
-    case 'generale': return 'fa-comments';
-    case 'ganguri': return 'fa-skull';
-    case 'departamente': return 'fa-shield-halved';
-    case 'rapoarte': return 'fa-triangle-exclamation';
-    case 'sugestii': return 'fa-lightbulb';
+    case 'regulament-server': return 'fa-book-skull';
+    case 'ghid-rp': return 'fa-graduation-cap';
+    case 'server-showcase': return 'fa-video';
+    case 'aplicatii-staff': return 'fa-user-shield';
+    case 'screenshots-gallery': return 'fa-camera-retro';
+    case 'povesti-character': return 'fa-feather-pointed';
+    case 'business-ic': return 'fa-briefcase';
+    case 'guvern-reports': return 'fa-landmark';
+    case 'lspd': return 'fa-building-shield';
+    case 'ems': return 'fa-truck-medical';
+    case 'ganguri-non-oficiale': return 'fa-skull-crossbones';
+    case 'ganguri-oficiale': return 'fa-crown';
+    case 'cerere-gang': return 'fa-file-pen';
+    case 'ghid-gang': return 'fa-book-journal-whills';
     default: return 'fa-message';
   }
 }
 
-function selectCategory(category, buttonEl) {
-  currentCategoryFilter = category;
+function getCategoryName(cat) {
+  switch (cat) {
+    case 'anunturi': return 'Anunțuri & Oficial';
+    case 'regulament-server': return 'Regulament Server';
+    case 'ghid-rp': return 'Ghid Roleplay';
+    case 'server-showcase': return 'Server Showcase';
+    case 'aplicatii-staff': return 'Aplicații Staff';
+    case 'screenshots-gallery': return 'Screenshots Gallery';
+    case 'povesti-character': return 'Povești Character';
+    case 'business-ic': return 'Business IC';
+    case 'guvern-reports': return 'Guvern & Rapoarte';
+    case 'lspd': return 'LSPD - Poliție';
+    case 'ems': return 'EMS - Paramedici';
+    case 'ganguri-non-oficiale': return 'Gang-uri Non Oficiale';
+    case 'ganguri-oficiale': return 'Gang-uri Oficiale';
+    case 'cerere-gang': return 'Cerere Gang';
+    case 'ghid-gang': return 'Ghid Gang Roleplay';
+    default: return 'Discuție';
+  }
+}
+
+// Category Pill Filter
+function selectCategoryGroup(group, buttonEl) {
+  currentCategoryGroupFilter = group;
   document.querySelectorAll('.category-pills .pill').forEach(btn => btn.classList.remove('active'));
   if (buttonEl) buttonEl.classList.add('active');
   filterTopics();
@@ -907,10 +1086,6 @@ function selectCategory(category, buttonEl) {
 function filterTopics() {
   const query = document.getElementById('forumSearch').value.toLowerCase().trim();
   let filtered = currentTopics;
-
-  if (currentCategoryFilter !== 'all') {
-    filtered = filtered.filter(t => t.category === currentCategoryFilter);
-  }
 
   if (query) {
     filtered = filtered.filter(t => 
@@ -963,7 +1138,20 @@ function closeModal(id) {
   if (modal) modal.classList.remove('active-modal');
 }
 
+// STRICT PERMISSIONS: New Post Modal
 function openNewPostModal(preselectedCategory = null) {
+  if (!currentUser) {
+    showToast('⚠️ Trebuie să fii autentificat pe cont pentru a putea crea un topic!', 'error');
+    openLoginModal();
+    return;
+  }
+
+  const authorInput = document.getElementById('authorName');
+  if (authorInput) {
+    authorInput.value = currentUser.name;
+    authorInput.readOnly = true;
+  }
+
   if (preselectedCategory) {
     document.getElementById('topicCategory').value = preselectedCategory;
   }
@@ -979,7 +1167,7 @@ function viewTopicDetail(id) {
   saveTopics();
 
   document.getElementById('modalTopicTitle').innerText = topic.title;
-  document.getElementById('modalCategoryBadge').innerText = topic.category.toUpperCase();
+  document.getElementById('modalCategoryBadge').innerText = getCategoryName(topic.category).toUpperCase();
   document.getElementById('modalAuthorName').innerText = topic.author;
   document.getElementById('modalPostDate').innerText = topic.date;
   document.getElementById('modalPostContent').innerText = topic.content;
@@ -1004,18 +1192,33 @@ function renderModalReplies(replies) {
 
   if (replies.length === 0) {
     list.innerHTML = `<div style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 10px;">Fii primul care lasă un răspuns!</div>`;
-    return;
+  } else {
+    list.innerHTML = replies.map(r => `
+      <div class="reply-item">
+        <div class="reply-item-header">
+          <strong>${escapeHtml(r.author)}</strong>
+          <span class="text-muted">${escapeHtml(r.date)}</span>
+        </div>
+        <div style="color: var(--text-main); font-size: 13.5px;">${escapeHtml(r.content)}</div>
+      </div>
+    `).join('');
   }
 
-  list.innerHTML = replies.map(r => `
-    <div class="reply-item">
-      <div class="reply-item-header">
-        <strong>${escapeHtml(r.author)}</strong>
-        <span class="text-muted">${escapeHtml(r.date)}</span>
-      </div>
-      <div style="color: var(--text-main); font-size: 13.5px;">${escapeHtml(r.content)}</div>
-    </div>
-  `).join('');
+  // Strict Permissions: Toggle Reply form vs Guest Alert
+  const replyForm = document.getElementById('replyForm');
+  const replyGuestAlert = document.getElementById('replyGuestAlert');
+  if (currentUser) {
+    if (replyForm) replyForm.style.display = 'block';
+    if (replyGuestAlert) replyGuestAlert.style.display = 'none';
+    const authorInput = document.getElementById('replyAuthor');
+    if (authorInput) {
+      authorInput.value = currentUser.name;
+      authorInput.readOnly = true;
+    }
+  } else {
+    if (replyForm) replyForm.style.display = 'none';
+    if (replyGuestAlert) replyGuestAlert.style.display = 'flex';
+  }
 }
 
 function ownerTogglePinCurrentTopic() {
@@ -1040,22 +1243,26 @@ function ownerDeleteCurrentTopic() {
   showToast('👑 Topicul a fost ȘTERS de către conducere!', 'success');
 }
 
+// STRICT PERMISSIONS: Add Reply Handler
 function handleAddReply(e) {
   e.preventDefault();
-  const authorInput = document.getElementById('replyAuthor');
-  const contentInput = document.getElementById('replyContent');
+  if (!currentUser) {
+    showToast('⚠️ Trebuie să fii autentificat pentru a răspunde!', 'error');
+    openLoginModal();
+    return;
+  }
 
-  const author = authorInput.value.trim();
+  const contentInput = document.getElementById('replyContent');
   const content = contentInput.value.trim();
 
-  if (!author || !content || !currentViewingTopicId) return;
+  if (!content || !currentViewingTopicId) return;
 
   const topic = currentTopics.find(t => t.id === currentViewingTopicId);
   if (topic) {
     if (!topic.replies) topic.replies = [];
     topic.replies.push({
-      author: author,
-      authorUsername: currentUser ? currentUser.username : author.toLowerCase(),
+      author: currentUser.name,
+      authorUsername: currentUser.username,
       date: 'Chiar acum',
       content: content
     });
@@ -1064,27 +1271,39 @@ function handleAddReply(e) {
     contentInput.value = '';
     showToast('Răspunsul tău a fost publicat!', 'success');
     renderTopics();
-    if (currentUser) renderProfileView();
+    renderProfileView();
   }
 }
 
+// STRICT PERMISSIONS: Create Topic Handler
 function handleCreateTopic(e) {
   e.preventDefault();
+  if (!currentUser) {
+    showToast('⚠️ Trebuie să fii autentificat pe cont pentru a posta!', 'error');
+    openLoginModal();
+    return;
+  }
+
   const title = document.getElementById('topicTitle').value.trim();
   const category = document.getElementById('topicCategory').value;
-  const author = document.getElementById('authorName').value.trim();
   const content = document.getElementById('topicContent').value.trim();
 
-  if (!title || !author || !content) return;
+  // Restriction for official announcements
+  if (category === 'anunturi' && currentUser.role !== 'owner') {
+    showToast('⛔ Doar conducerea (Seek & Ghost) poate publica în Anunțuri Oficiale!', 'error');
+    return;
+  }
 
-  const isOwnerPosting = currentUser && currentUser.role === 'owner';
+  if (!title || !content) return;
+
+  const isOwnerPosting = currentUser.role === 'owner';
 
   const newTopic = {
     id: Date.now(),
     category: category,
     title: title,
-    author: author,
-    authorUsername: currentUser ? currentUser.username : author.toLowerCase(),
+    author: currentUser.name,
+    authorUsername: currentUser.username,
     date: 'Chiar acum',
     content: content,
     views: 1,
@@ -1098,17 +1317,34 @@ function handleCreateTopic(e) {
   closeModal('newPostModal');
   document.getElementById('newTopicForm').reset();
   showToast('Topic nou creat pe forumul BandoPlug!', 'success');
-  if (currentUser) renderProfileView();
+  renderProfileView();
 }
 
+// STRICT PERMISSIONS: Application Form
 function openApplyForm(type) {
+  if (!currentUser) {
+    showToast('⚠️ Trebuie să fii autentificat pe cont pentru a trimite o aplicație!', 'error');
+    openLoginModal();
+    return;
+  }
+
   document.getElementById('applyType').value = type;
   document.getElementById('applyModalTitle').innerText = `Aplicație: ${type}`;
+  const discInput = document.getElementById('applicantDiscord');
+  if (discInput && currentUser) {
+    discInput.value = `@${currentUser.username}`;
+  }
   openModal('applyModal');
 }
 
 function handleApplicationSubmit(e) {
   e.preventDefault();
+  if (!currentUser) {
+    showToast('⚠️ Autentificare necesară!', 'error');
+    openLoginModal();
+    return;
+  }
+
   const type = document.getElementById('applyType').value;
   const realName = document.getElementById('applicantRealName').value.trim();
   const discord = document.getElementById('applicantDiscord').value.trim();

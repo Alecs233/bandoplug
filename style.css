@@ -842,6 +842,49 @@ a {
   gap: 26px;
 }
 
+/* Category Group Blocks */
+.category-group-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.category-group-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  background: linear-gradient(90deg, rgba(255, 30, 56, 0.15) 0%, rgba(22, 26, 34, 0.6) 100%);
+  border-left: 4px solid var(--primary-red);
+  border-radius: var(--radius-sm);
+}
+
+.category-group-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+/* Guest reply alert in XenForo style */
+.xf-reply-guest-box {
+  background: rgba(255, 30, 56, 0.1);
+  border: 1px solid rgba(255, 30, 56, 0.3);
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #fff;
+  margin-top: 15px;
+}
+
+.xf-reply-guest-box i {
+  font-size: 20px;
+}
+
 .forum-section-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);

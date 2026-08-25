@@ -137,7 +137,7 @@
         </div>
         <h1 class="hero-heading">BANDO<span>PLUG</span> ROMÂNIA</h1>
         <p class="hero-desc">
-          Bun venit pe portalul oficial al comunității <strong>BandoPlug</strong>. Experimentează cel mai avansat sistem de Roleplay urban, gang-uri personalizate, economie dinamică, evenimente zilnice și o comunitate unită.
+          Bun venit pe portalul oficial al comunității <strong>BandoPlug</strong>. Experimentează cel mai avansat sistem de Roleplay urban, gang-uri personalizate, economie dinamică, departamente de elită și o comunitate unită.
         </p>
 
         <div class="hero-cta-group">
@@ -210,103 +210,241 @@
       <div class="forum-control-bar">
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="forumSearch" placeholder="Caută topicuri, reguli, anunțuri, ghiduri..." oninput="filterTopics()">
+          <input type="text" id="forumSearch" placeholder="Caută topicuri, regulamente, ghiduri, gang-uri, LSPD..." oninput="filterTopics()">
         </div>
         <div class="category-pills" id="categoryPills">
-          <button class="pill active" onclick="selectCategory('all', this)"><i class="fa-solid fa-layer-group"></i> Toate</button>
-          <button class="pill" onclick="selectCategory('anunturi', this)"><i class="fa-solid fa-bullhorn"></i> Anunțuri</button>
-          <button class="pill" onclick="selectCategory('generale', this)"><i class="fa-solid fa-comments"></i> Generale</button>
-          <button class="pill" onclick="selectCategory('ganguri', this)"><i class="fa-solid fa-skull"></i> Gang-uri</button>
-          <button class="pill" onclick="selectCategory('departamente', this)"><i class="fa-solid fa-shield-halved"></i> Departamente</button>
-          <button class="pill" onclick="selectCategory('rapoarte', this)"><i class="fa-solid fa-triangle-exclamation"></i> Reclamații</button>
-          <button class="pill" onclick="selectCategory('sugestii', this)"><i class="fa-solid fa-lightbulb"></i> Sugestii</button>
+          <button class="pill active" onclick="selectCategoryGroup('all', this)"><i class="fa-solid fa-layer-group"></i> Toate</button>
+          <button class="pill" onclick="selectCategoryGroup('server-info', this)"><i class="fa-solid fa-circle-info"></i> Server Information</button>
+          <button class="pill" onclick="selectCategoryGroup('in-character', this)"><i class="fa-solid fa-user-ninja"></i> In Character</button>
+          <button class="pill" onclick="selectCategoryGroup('factiuni-legale', this)"><i class="fa-solid fa-building-shield"></i> Facțiuni Legale</button>
+          <button class="pill" onclick="selectCategoryGroup('ganguri', this)"><i class="fa-solid fa-skull"></i> Gang-uri</button>
         </div>
       </div>
 
       <!-- Main Layout: Forum Categories & Sidebar -->
       <div class="layout-grid">
         
-        <!-- Left: Forum Categories & Topics List -->
+        <!-- Left: Exact Categories & Topics Hierarchy -->
         <div class="content-column">
           
-          <!-- Category Group 1: Oficial & Anunțuri -->
-          <div class="forum-section-card" data-category-group="anunturi">
-            <div class="section-header">
-              <div class="section-title">
-                <i class="fa-solid fa-bullhorn text-red"></i>
-                <h2>Anunțuri & Informații Oficiale</h2>
-              </div>
-              <span class="badge-count">Oficial</span>
+          <!-- ==========================================
+               SECTION 1: SERVER INFORMATION
+               ========================================== -->
+          <div class="category-group-block" data-parent-group="server-info">
+            <div class="category-group-header">
+              <i class="fa-solid fa-server text-red"></i>
+              <h2>Server Information</h2>
             </div>
 
-            <div class="topics-list" id="list-anunturi">
-              <!-- Dynamically populated -->
+            <!-- 1.1 Regulament Server -->
+            <div class="forum-section-card" data-cat-id="regulament-server">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-book-skull text-red"></i>
+                  <h2>Regulament Server</h2>
+                </div>
+                <span class="badge-count">Reguli</span>
+              </div>
+              <div class="topics-list" id="list-regulament-server"></div>
+            </div>
+
+            <!-- 1.2 Ghid Roleplay -->
+            <div class="forum-section-card" data-cat-id="ghid-rp">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-graduation-cap text-gold"></i>
+                  <h2>Ghid Roleplay</h2>
+                </div>
+                <span class="badge-count">Tutoriale</span>
+              </div>
+              <div class="topics-list" id="list-ghid-rp"></div>
+            </div>
+
+            <!-- 1.3 Server Showcase -->
+            <div class="forum-section-card" data-cat-id="server-showcase">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-video text-blue"></i>
+                  <h2>Server Showcase</h2>
+                </div>
+                <span class="badge-count">Prezentare</span>
+              </div>
+              <div class="topics-list" id="list-server-showcase"></div>
+            </div>
+
+            <!-- 1.4 Anunturi -->
+            <div class="forum-section-card" data-cat-id="anunturi">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-bullhorn text-red"></i>
+                  <h2>Anunțuri & Oficial</h2>
+                </div>
+                <span class="badge-count">Conducere</span>
+              </div>
+              <div class="topics-list" id="list-anunturi"></div>
+            </div>
+
+            <!-- 1.5 Aplicatii Staff -->
+            <div class="forum-section-card" data-cat-id="aplicatii-staff">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-user-shield text-green"></i>
+                  <h2>Aplicații Staff</h2>
+                </div>
+                <span class="badge-count">Recrutare</span>
+              </div>
+              <div class="topics-list" id="list-aplicatii-staff"></div>
             </div>
           </div>
 
-          <!-- Category Group 2: Comunitate & Discuții Libere -->
-          <div class="forum-section-card" data-category-group="generale">
-            <div class="section-header">
-              <div class="section-title">
-                <i class="fa-solid fa-comments text-red"></i>
-                <h2>Comunitate & Discuții Generale</h2>
-              </div>
-              <span class="badge-count">Social</span>
+          <!-- ==========================================
+               SECTION 2: IN CHARACTER
+               ========================================== -->
+          <div class="category-group-block" data-parent-group="in-character">
+            <div class="category-group-header">
+              <i class="fa-solid fa-masks-theater text-gold"></i>
+              <h2>In Character (IC)</h2>
             </div>
 
-            <div class="topics-list" id="list-generale"></div>
+            <!-- 2.1 Screenshots Gallery -->
+            <div class="forum-section-card" data-cat-id="screenshots-gallery">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-camera-retro text-gold"></i>
+                  <h2>Screenshots Gallery</h2>
+                </div>
+                <span class="badge-count">Media</span>
+              </div>
+              <div class="topics-list" id="list-screenshots-gallery"></div>
+            </div>
+
+            <!-- 2.2 Povesti Character -->
+            <div class="forum-section-card" data-cat-id="povesti-character">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-feather-pointed text-blue"></i>
+                  <h2>Povești Character</h2>
+                </div>
+                <span class="badge-count">Lore RP</span>
+              </div>
+              <div class="topics-list" id="list-povesti-character"></div>
+            </div>
+
+            <!-- 2.3 Business IC -->
+            <div class="forum-section-card" data-cat-id="business-ic">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-briefcase text-green"></i>
+                  <h2>Business IC</h2>
+                </div>
+                <span class="badge-count">Economie</span>
+              </div>
+              <div class="topics-list" id="list-business-ic"></div>
+            </div>
           </div>
 
-          <!-- Category Group 3: Gang-uri & Ilegale -->
-          <div class="forum-section-card" data-category-group="ganguri">
-            <div class="section-header">
-              <div class="section-title">
-                <i class="fa-solid fa-skull-crossbones text-red"></i>
-                <h2>Facțiuni Ilegale & Carteluri</h2>
-              </div>
-              <span class="badge-count">Ilegal RP</span>
+          <!-- ==========================================
+               SECTION 3: FACTIUNI LEGALE
+               ========================================== -->
+          <div class="category-group-block" data-parent-group="factiuni-legale">
+            <div class="category-group-header">
+              <i class="fa-solid fa-shield-halved text-blue"></i>
+              <h2>Facțiuni Legale</h2>
             </div>
 
-            <div class="topics-list" id="list-ganguri"></div>
+            <!-- 3.1 Guvern si Reports -->
+            <div class="forum-section-card" data-cat-id="guvern-reports">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-landmark text-gold"></i>
+                  <h2>Guvern și Reports (Rapoarte)</h2>
+                </div>
+                <span class="badge-count">Oficial</span>
+              </div>
+              <div class="topics-list" id="list-guvern-reports"></div>
+            </div>
+
+            <!-- 3.2 Guvern: Los Santos Police Department -->
+            <div class="forum-section-card" data-cat-id="lspd">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-building-shield text-blue"></i>
+                  <h2>Guvern: Los Santos Police Department (LSPD)</h2>
+                </div>
+                <span class="badge-count">Poliție</span>
+              </div>
+              <div class="topics-list" id="list-lspd"></div>
+            </div>
+
+            <!-- 3.3 Guvern: Los Santos Paramedic Department -->
+            <div class="forum-section-card" data-cat-id="ems">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-truck-medical text-green"></i>
+                  <h2>Guvern: Los Santos Paramedic Department (EMS)</h2>
+                </div>
+                <span class="badge-count">Spital & Medici</span>
+              </div>
+              <div class="topics-list" id="list-ems"></div>
+            </div>
           </div>
 
-          <!-- Category Group 4: Departamente Legale -->
-          <div class="forum-section-card" data-category-group="departamente">
-            <div class="section-header">
-              <div class="section-title">
-                <i class="fa-solid fa-building-shield text-red"></i>
-                <h2>Departamente Legale & Instituții (LSPD / EMS)</h2>
-              </div>
-              <span class="badge-count">Legal RP</span>
+          <!-- ==========================================
+               SECTION 4: GANGURI
+               ========================================== -->
+          <div class="category-group-block" data-parent-group="ganguri">
+            <div class="category-group-header">
+              <i class="fa-solid fa-skull text-red"></i>
+              <h2>Gang-uri & Ilegale</h2>
             </div>
 
-            <div class="topics-list" id="list-departamente"></div>
-          </div>
-
-          <!-- Category Group 5: Reclamații, Debanări & Suport -->
-          <div class="forum-section-card" data-category-group="rapoarte">
-            <div class="section-header">
-              <div class="section-title">
-                <i class="fa-solid fa-scale-balanced text-red"></i>
-                <h2>Suport, Reclamații & Cereri Debanare</h2>
+            <!-- 4.1 Ganguri Non Oficiale -->
+            <div class="forum-section-card" data-cat-id="ganguri-non-oficiale">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-skull-crossbones text-muted"></i>
+                  <h2>Gang-uri Non Oficiale</h2>
+                </div>
+                <span class="badge-count">Grupări</span>
               </div>
-              <span class="badge-count">Asistență</span>
+              <div class="topics-list" id="list-ganguri-non-oficiale"></div>
             </div>
 
-            <div class="topics-list" id="list-rapoarte"></div>
-          </div>
-
-          <!-- Category Group 6: Sugestii & Propuneri -->
-          <div class="forum-section-card" data-category-group="sugestii">
-            <div class="section-header">
-              <div class="section-title">
-                <i class="fa-solid fa-lightbulb text-red"></i>
-                <h2>Sugestii & Idei de Dezvoltare</h2>
+            <!-- 4.2 Ganguri Oficiale -->
+            <div class="forum-section-card" data-cat-id="ganguri-oficiale">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-crown text-red"></i>
+                  <h2>Gang-uri Oficiale</h2>
+                </div>
+                <span class="badge-count">Carteluri & Mafii</span>
               </div>
-              <span class="badge-count">Comunitate</span>
+              <div class="topics-list" id="list-ganguri-oficiale"></div>
             </div>
 
-            <div class="topics-list" id="list-sugestii"></div>
+            <!-- 4.3 Cerere Gang -->
+            <div class="forum-section-card" data-cat-id="cerere-gang">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-file-pen text-gold"></i>
+                  <h2>Cerere Gang</h2>
+                </div>
+                <span class="badge-count">Înregistrare</span>
+              </div>
+              <div class="topics-list" id="list-cerere-gang"></div>
+            </div>
+
+            <!-- 4.4 Ghid Gang Roleplay -->
+            <div class="forum-section-card" data-cat-id="ghid-gang">
+              <div class="section-header">
+                <div class="section-title">
+                  <i class="fa-solid fa-book-journal-whills text-red"></i>
+                  <h2>Ghid Gang Roleplay</h2>
+                </div>
+                <span class="badge-count">Ghid Ilegal</span>
+              </div>
+              <div class="topics-list" id="list-ghid-gang"></div>
+            </div>
           </div>
 
         </div>
@@ -914,24 +1052,41 @@
       <form id="newTopicForm" onsubmit="handleCreateTopic(event)">
         <div class="form-group">
           <label for="topicTitle">Titlul Topicului *</label>
-          <input type="text" id="topicTitle" required placeholder="ex: [PRODUCȚIE] Nou Ghid pentru Începători în Los Santos">
+          <input type="text" id="topicTitle" required placeholder="ex: [GHID] Regulament Intern și Conduită">
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="topicCategory">Categorie *</label>
+            <label for="topicCategory">Categorie / Secțiune *</label>
             <select id="topicCategory" required>
-              <option value="anunturi">Anunțuri & Oficial</option>
-              <option value="generale" selected>Comunitate & Discuții Generale</option>
-              <option value="ganguri">Facțiuni Ilegale & Gang-uri</option>
-              <option value="departamente">Departamente Legale (LSPD / EMS)</option>
-              <option value="rapoarte">Reclamații & Suport</option>
-              <option value="sugestii">Sugestii & Propuneri</option>
+              <optgroup label="📌 SERVER INFORMATION">
+                <option value="regulament-server">Regulament Server</option>
+                <option value="ghid-rp">Ghid Roleplay</option>
+                <option value="server-showcase">Server Showcase</option>
+                <option value="anunturi">Anunțuri Oficiale (Doar Conducere)</option>
+                <option value="aplicatii-staff">Aplicații Staff</option>
+              </optgroup>
+              <optgroup label="🎭 IN CHARACTER">
+                <option value="screenshots-gallery">Screenshots Gallery</option>
+                <option value="povesti-character">Povești Character</option>
+                <option value="business-ic">Business IC</option>
+              </optgroup>
+              <optgroup label="🚔 FACȚIUNI LEGALE">
+                <option value="guvern-reports">Guvern și Reports (Rapoarte)</option>
+                <option value="lspd">Guvern: Los Santos Police Department (LSPD)</option>
+                <option value="ems">Guvern: Los Santos Paramedic Department (EMS)</option>
+              </optgroup>
+              <optgroup label="💀 GANG-URI & ILEGALE">
+                <option value="ganguri-non-oficiale">Gang-uri Non Oficiale</option>
+                <option value="ganguri-oficiale">Gang-uri Oficiale</option>
+                <option value="cerere-gang">Cerere Gang</option>
+                <option value="ghid-gang">Ghid Gang Roleplay</option>
+              </optgroup>
             </select>
           </div>
           <div class="form-group">
-            <label for="authorName">Numele Tău (sau cont Discord) *</label>
-            <input type="text" id="authorName" required placeholder="ex: PlugMaster_RO">
+            <label for="authorName">Autor (Cont Conectat) *</label>
+            <input type="text" id="authorName" required readonly style="background: var(--bg-card); cursor: not-allowed;">
           </div>
         </div>
 
@@ -975,7 +1130,7 @@
           <!-- Owner Controls inside Topic -->
           <div id="modalOwnerControls" style="display: none; margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(245, 158, 11, 0.3); justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div style="font-size: 12px; color: var(--gold-accent); font-weight: 700;">
-              <i class="fa-solid fa-shield-halved"></i> Acțiuni Owner:
+              <i class="fa-solid fa-shield-halved"></i> Acțiuni Conducere:
             </div>
             <div style="display: flex; gap: 8px;">
               <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="ownerTogglePinCurrentTopic()">
@@ -993,10 +1148,16 @@
           <h3><i class="fa-solid fa-reply text-red"></i> Răspunsuri (<span id="replyCount">0</span>)</h3>
           <div class="replies-list" id="modalRepliesList"></div>
 
-          <!-- Add reply form -->
+          <!-- Alert for Guests when not logged in -->
+          <div class="xf-reply-guest-box" id="replyGuestAlert" style="display: none;">
+            <i class="fa-solid fa-lock text-red"></i> 
+            <span>Trebuie să fii <a href="javascript:void(0)" onclick="openLoginModal()" class="text-red font-weight-bold">conectat</a> sau să te <a href="javascript:void(0)" onclick="openRegisterModal()" class="text-green font-weight-bold">înregistrezi</a> pentru a răspunde la această discuție.</span>
+          </div>
+
+          <!-- Add reply form (visible only when logged in) -->
           <form class="add-reply-form" id="replyForm" onsubmit="handleAddReply(event)">
             <div class="form-row">
-              <input type="text" id="replyAuthor" required placeholder="Numele tău..." class="reply-input-name">
+              <input type="text" id="replyAuthor" required readonly placeholder="Numele tău..." class="reply-input-name" style="cursor: not-allowed;">
               <input type="text" id="replyContent" required placeholder="Scrie un răspuns la acest topic..." class="reply-input-text">
               <button type="submit" class="btn btn-red-glow"><i class="fa-solid fa-paper-plane"></i> Răspunde</button>
             </div>
@@ -1024,7 +1185,7 @@
         <div class="form-row">
           <div class="form-group">
             <label>Nume Discord (Tag) *</label>
-            <input type="text" id="applicantDiscord" required placeholder="ex: andrei#0000 sau @andrei">
+            <input type="text" id="applicantDiscord" required placeholder="ex: @andrei_rp">
           </div>
           <div class="form-group">
             <label>Nume În Joc (Roleplay) *</label>
