@@ -1529,8 +1529,20 @@
     </div>
   </footer>
 
-  <!-- Embedded Fail-Safe Guest Script Handlers -->
+  <!-- Embedded Complete Fail-Safe Guest & Forum Engine -->
   <script>
+    function togglePassVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<i class="fa-regular fa-eye-slash"></i> Hide';
+      } else {
+        input.type = 'password';
+        btn.innerHTML = '<i class="fa-regular fa-eye"></i> Show';
+      }
+    }
+
     function switchGuestTab(tab) {
       const loginForm = document.getElementById('inlineLoginForm');
       const regForm = document.getElementById('inlineRegisterForm');
@@ -1566,6 +1578,71 @@
       }
     }
 
+    function applyUserSessionToDOM(user) {
+      if (!user) return;
+      localStorage.setItem('bandoplug_user_xf', JSON.stringify(user));
+
+      const guestView = document.getElementById('view-guest-login');
+      const forumView = document.getElementById('view-forum');
+      const loggedOutBtns = document.getElementById('authLoggedOutBtns');
+      const loggedInUser = document.getElementById('authLoggedInUser');
+      const navUserName = document.getElementById('navUserName');
+      const navAvatar = document.getElementById('navUserAvatar');
+      const dropdownName = document.getElementById('dropdownName');
+      const dropdownTag = document.getElementById('dropdownTag');
+      const dropdownRoleBadge = document.getElementById('dropdownRoleBadge');
+      const navAdminLink = document.getElementById('navAdminLink');
+      const dropdownAdminLink = document.getElementById('dropdownAdminLink');
+
+      if (guestView) {
+        guestView.style.display = 'none';
+        guestView.classList.remove('active-view');
+      }
+      if (forumView) {
+        forumView.style.display = 'block';
+        forumView.classList.add('active-view');
+      }
+      if (loggedOutBtns) loggedOutBtns.style.display = 'none';
+      if (loggedInUser) loggedInUser.style.display = 'flex';
+
+      if (navUserName) navUserName.innerText = user.name;
+      if (navAvatar) navAvatar.src = user.avatar || 'bandoplug.png';
+      if (dropdownName) dropdownName.innerText = user.name;
+      if (dropdownTag) dropdownTag.innerHTML = '<i class="fa-brands fa-discord text-blurple"></i> @' + user.username;
+
+      if (user.role === 'owner') {
+        if (dropdownRoleBadge) {
+          dropdownRoleBadge.className = 'role-badge badge-owner';
+          dropdownRoleBadge.innerText = 'FOUNDER & OWNER';
+        }
+        if (navAdminLink) navAdminLink.style.display = 'flex';
+        if (dropdownAdminLink) dropdownAdminLink.style.display = 'flex';
+      } else {
+        if (dropdownRoleBadge) {
+          dropdownRoleBadge.className = 'role-badge badge-dev';
+          dropdownRoleBadge.innerText = 'MEMBRU VERIFICAT';
+        }
+        if (navAdminLink) navAdminLink.style.display = 'none';
+        if (dropdownAdminLink) dropdownAdminLink.style.display = 'none';
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showStandaloneToast(message, isSuccess = true) {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = '<i class="fa-solid ' + (isSuccess ? 'fa-circle-check text-green' : 'fa-triangle-exclamation text-red') + '" style="font-size: 18px;"></i><div>' + message + '</div>';
+      container.appendChild(toast);
+      setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(function() { toast.remove(); }, 300);
+      }, 3500);
+    }
+
     function doInlineLogin() {
       const userInput = document.getElementById('inlineLoginUser');
       const passInput = document.getElementById('inlineLoginPass');
@@ -1573,7 +1650,8 @@
       const password = passInput ? passInput.value.trim() : '';
 
       if (!rawUser) {
-        showToast('Te rugăm să introduci numele de utilizator!', 'error');
+        showStandaloneToast('Te rugăm să introduci numele de utilizator!', false);
+        if (userInput) userInput.focus();
         return;
       }
 
@@ -1585,7 +1663,7 @@
       const sessionUser = {
         name: displayName,
         username: cleanUser,
-        email: `${cleanUser.toLowerCase()}@bandoplug.ro`,
+        email: cleanUser.toLowerCase() + '@bandoplug.ro',
         role: userRole,
         avatar: 'bandoplug.png',
         bio: isOwner ? 'Fondator & Conducere Oficială BandoPlug RP.' : 'Membru BandoPlug.',
@@ -1593,9 +1671,8 @@
         joinedDate: 'Astăzi'
       };
 
-      saveAuthUser(sessionUser);
-      showToast(isOwner ? `👑 Bine ai revenit, Owner ${displayName}!` : `Te-ai conectat cu succes! Bun venit, ${displayName}.`, 'success');
-      switchView('forum');
+      applyUserSessionToDOM(sessionUser);
+      showStandaloneToast(isOwner ? '👑 Bine ai revenit, Owner ' + displayName + '!' : 'Te-ai conectat cu succes! Bun venit, ' + displayName + '.', true);
     }
 
     function doInlineRegister() {
@@ -1604,15 +1681,12 @@
       const passInput = document.getElementById('inlineRegPass');
 
       const rawUser = userInput ? userInput.value.trim() : '';
-      const email = (emailInput && emailInput.value.trim()) ? emailInput.value.trim().toLowerCase() : `${rawUser.toLowerCase()}@bandoplug.ro`;
+      const email = (emailInput && emailInput.value.trim()) ? emailInput.value.trim().toLowerCase() : (rawUser.toLowerCase() + '@bandoplug.ro');
       const password = passInput ? passInput.value.trim() : '';
 
       if (!rawUser) {
-        showToast('Te rugăm să alegi un Username!', 'error');
-        return;
-      }
-      if (!password || password.length < 3) {
-        showToast('Parola trebuie să aibă minim 3 caractere!', 'error');
+        showStandaloneToast('Te rugăm să alegi un Username!', false);
+        if (userInput) userInput.focus();
         return;
       }
 
@@ -1632,9 +1706,8 @@
         joinedDate: 'Astăzi'
       };
 
-      saveAuthUser(sessionUser);
-      showToast(`🎉 Felicitări, ${displayName}! Contul tău a fost creat și activat.`, 'success');
-      switchView('forum');
+      applyUserSessionToDOM(sessionUser);
+      showStandaloneToast('🎉 Felicitări, ' + displayName + '! Contul tău a fost creat și activat.', true);
     }
 
     function quickDiscordAuthPrompt() {
@@ -1648,7 +1721,7 @@
       const sessionUser = {
         name: displayName,
         username: cleanUser,
-        email: `${cleanUser.toLowerCase()}@discord.auth`,
+        email: cleanUser.toLowerCase() + '@discord.auth',
         role: isOwner ? 'owner' : 'member',
         avatar: 'bandoplug.png',
         bio: isOwner ? 'Fondator & Conducere Oficială BandoPlug RP.' : 'Membru verificat prin Discord.',
@@ -1656,13 +1729,25 @@
         joinedDate: 'Astăzi'
       };
 
-      saveAuthUser(sessionUser);
-      showToast(`Te-ai conectat prin Discord ca @${cleanUser}!`, 'success');
-      switchView('forum');
+      applyUserSessionToDOM(sessionUser);
+      showStandaloneToast('Te-ai conectat prin Discord ca @' + cleanUser + '!', true);
     }
+
+    // Auto-check on load if user already logged in
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        const saved = localStorage.getItem('bandoplug_user_xf');
+        if (saved) {
+          const u = JSON.parse(saved);
+          if (u && u.name) {
+            applyUserSessionToDOM(u);
+          }
+        }
+      } catch(e) {}
+    });
   </script>
 
   <!-- External App Script -->
-  <script src="app.js?v=5.0"></script>
+  <script src="app.js?v=6.0"></script>
 </body>
 </html>
