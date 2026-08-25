@@ -1991,31 +1991,58 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function isOwnerUsername(username) {
+      if (!username) return false;
+      const clean = username.toLowerCase().replace(/[@#]/g, '').trim();
+      return ['seekmao', 'seek', 'ghostbeleaua', 'ghost', 'ghostmao'].includes(clean);
+    }
+
     function renderProfileView() {
       if (!currentUser) return;
-      const nameEl = document.getElementById('profileHeaderName');
-      const avatarEl = document.getElementById('profileHeaderAvatar');
-      const roleEl = document.getElementById('profileHeaderRole');
-      const bioEl = document.getElementById('profileBioText');
-      const joinedEl = document.getElementById('profileJoinedDate');
-      const postsCountEl = document.getElementById('profilePostsCount');
+      const isOwner = currentUser.role === 'owner' || isOwnerUsername(currentUser.username);
+
+      const nameEl = document.getElementById('profileDisplayName');
+      const avatarEl = document.getElementById('profileAvatarImg');
+      const roleEl = document.getElementById('profileRoleBadge');
+      const discordEl = document.getElementById('profileDiscordTag');
+      const emailEl = document.getElementById('profileEmailMeta');
+      const bioEl = document.getElementById('profileBio');
+      const joinedEl = document.getElementById('profileStatJoined');
+      const topicsCountEl = document.getElementById('profileStatTopics');
+
+      const aboutUserEl = document.getElementById('aboutUsername');
+      const aboutDiscordEl = document.getElementById('aboutDiscord');
+      const aboutEmailEl = document.getElementById('aboutEmail');
+      const aboutRoleEl = document.getElementById('aboutRole');
 
       if (nameEl) nameEl.innerText = currentUser.name;
       if (avatarEl) avatarEl.src = currentUser.avatar || 'bandoplug.png';
       if (roleEl) {
-        roleEl.className = currentUser.role === 'owner' ? 'role-badge badge-owner' : 'role-badge badge-dev';
-        roleEl.innerText = currentUser.role === 'owner' ? 'FOUNDER & OWNER' : 'MEMBRU VERIFICAT';
+        roleEl.className = isOwner ? 'role-badge badge-owner' : 'role-badge badge-dev';
+        roleEl.innerText = isOwner ? 'FOUNDER & OWNER' : 'MEMBRU VERIFICAT';
       }
-      if (bioEl) bioEl.innerText = currentUser.bio || 'Membru oficial BandoPlug RP.';
+      if (discordEl) discordEl.innerHTML = '<i class="fa-brands fa-discord text-blurple"></i> @' + currentUser.username.toLowerCase();
+      if (emailEl) emailEl.innerHTML = '<i class="fa-regular fa-envelope"></i> ' + (currentUser.email || currentUser.username.toLowerCase() + '@bandoplug.ro');
+      if (bioEl) bioEl.innerText = currentUser.bio || (isOwner ? 'Fondator & Conducere Oficială BandoPlug FiveM Roleplay.' : 'Membru pe comunitatea oficială BandoPlug Roleplay.');
       if (joinedEl) joinedEl.innerText = currentUser.joinedDate || 'Astăzi';
 
-      const myTopics = liveTopics.filter(function(t) { return t.authorUsername === currentUser.username || t.author === currentUser.name; });
-      if (postsCountEl) postsCountEl.innerText = myTopics.length;
+      if (aboutUserEl) aboutUserEl.innerText = currentUser.name;
+      if (aboutDiscordEl) aboutDiscordEl.innerText = '@' + currentUser.username.toLowerCase();
+      if (aboutEmailEl) aboutEmailEl.innerText = currentUser.email || currentUser.username.toLowerCase() + '@bandoplug.ro';
+      if (aboutRoleEl) {
+        aboutRoleEl.className = isOwner ? 'text-gold font-weight-bold' : 'text-blue font-weight-bold';
+        aboutRoleEl.innerText = isOwner ? 'Founder & Owner' : 'Membru Verificat';
+      }
 
-      const listEl = document.getElementById('profileTopicsList');
+      const myTopics = liveTopics.filter(function(t) { 
+        return t.authorUsername === currentUser.username || t.author === currentUser.name; 
+      });
+      if (topicsCountEl) topicsCountEl.innerText = myTopics.length;
+
+      const listEl = document.getElementById('myTopicsListContainer') || document.getElementById('profileTopicsList');
       if (listEl) {
         if (myTopics.length === 0) {
-          listEl.innerHTML = '<div style="padding: 16px; color: #7d8590; text-align: center;">Nu ai creat niciun topic încă. Folosește butonul "+ Creează Topic" de sus!</div>';
+          listEl.innerHTML = '<div style="padding: 24px; color: #7d8590; text-align: center; font-size: 13.5px;"><i class="fa-solid fa-file-circle-plus" style="font-size: 28px; color: #ff1e38; margin-bottom: 8px; display: block;"></i>Nu ai creat niciun topic încă.<br>Folosește butonul "+ Creează Topic" de sus pentru a posta!</div>';
         } else {
           listEl.innerHTML = myTopics.map(function(t) {
             return '<div class="topic-row" style="cursor: pointer;" onclick="openEmbeddedTopic(' + t.id + ')">' +
@@ -2024,6 +2051,39 @@
           }).join('');
         }
       }
+    }
+
+    function switchProfileTab(tab) {
+      document.querySelectorAll('.profile-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      document.querySelectorAll('.profile-pane').forEach(function(p) { p.classList.remove('active'); });
+
+      if (tab === 'topics') {
+        const btn = document.getElementById('tabMyTopicsBtn');
+        const pane = document.getElementById('paneMyTopics');
+        if (btn) btn.classList.add('active');
+        if (pane) pane.classList.add('active');
+      } else if (tab === 'replies') {
+        const btn = document.getElementById('tabMyRepliesBtn');
+        const pane = document.getElementById('paneMyReplies');
+        if (btn) btn.classList.add('active');
+        if (pane) pane.classList.add('active');
+      } else if (tab === 'about') {
+        const btn = document.getElementById('tabMyAboutBtn');
+        const pane = document.getElementById('paneMyAbout');
+        if (btn) btn.classList.add('active');
+        if (pane) pane.classList.add('active');
+      }
+    }
+
+    function handlePostProfileStatus() {
+      const input = document.getElementById('profileStatusInput');
+      if (!input || !input.value.trim() || !currentUser) return;
+      currentUser.bio = input.value.trim();
+      localStorage.setItem('bandoplug_user_xf', JSON.stringify(currentUser));
+      applyUserSessionToDOM(currentUser);
+      input.value = '';
+      showStandaloneToast('Statusul tău a fost actualizat!', true);
+      renderProfileView();
     }
 
     function openAvatarModal() {
@@ -2038,6 +2098,7 @@
         localStorage.setItem('bandoplug_user_xf', JSON.stringify(currentUser));
         applyUserSessionToDOM(currentUser);
         showStandaloneToast('Poza de profil a fost actualizată!', true);
+        renderProfileView();
       }
     }
 
@@ -2048,6 +2109,7 @@
         localStorage.setItem('bandoplug_user_xf', JSON.stringify(currentUser));
         applyUserSessionToDOM(currentUser);
         showStandaloneToast('Avatar personalizat salvat!', true);
+        renderProfileView();
       }
       closeModal('avatarModal');
     }
@@ -2152,6 +2214,8 @@
       currentUser = user;
       localStorage.setItem('bandoplug_user_xf', JSON.stringify(user));
 
+      const isOwner = user.role === 'owner' || isOwnerUsername(user.username);
+
       const guestView = document.getElementById('view-guest-login');
       const forumView = document.getElementById('view-forum');
       const loggedOutBtns = document.getElementById('authLoggedOutBtns');
@@ -2181,13 +2245,13 @@
       if (navAvatar) navAvatar.src = user.avatar || 'bandoplug.png';
       if (dropdownAvatar) dropdownAvatar.src = user.avatar || 'bandoplug.png';
       if (dropdownName) dropdownName.innerText = user.name;
-      if (dropdownTag) dropdownTag.innerHTML = '<i class="fa-brands fa-discord text-blurple"></i> @' + user.username;
+      if (dropdownTag) dropdownTag.innerHTML = '<i class="fa-brands fa-discord text-blurple"></i> @' + user.username.toLowerCase();
       if (authorInput) {
         authorInput.value = user.name;
         authorInput.readOnly = true;
       }
 
-      if (user.role === 'owner') {
+      if (isOwner) {
         if (dropdownRoleBadge) {
           dropdownRoleBadge.className = 'role-badge badge-owner';
           dropdownRoleBadge.innerText = 'FOUNDER & OWNER';
@@ -2234,7 +2298,7 @@
       }
 
       const cleanUser = rawUser.replace(/[@#]/g, '').trim();
-      const isOwner = ['seekmao', 'seek', 'ghost', 'ghostmao'].includes(cleanUser.toLowerCase());
+      const isOwner = isOwnerUsername(cleanUser);
       const displayName = isOwner ? (cleanUser.toLowerCase().includes('seek') ? 'Seek' : 'Ghost') : cleanUser;
       const userRole = isOwner ? 'owner' : 'member';
 
@@ -2244,7 +2308,7 @@
         email: cleanUser.toLowerCase() + '@bandoplug.ro',
         role: userRole,
         avatar: 'bandoplug.png',
-        bio: isOwner ? 'Fondator & Conducere Oficială BandoPlug RP.' : 'Membru BandoPlug.',
+        bio: isOwner ? 'Fondator & Conducere Oficială BandoPlug RP.' : 'Membru pe comunitatea BandoPlug.',
         tag: '@' + cleanUser.toLowerCase(),
         joinedDate: 'Astăzi'
       };
@@ -2283,7 +2347,7 @@
       }
 
       const cleanUser = rawUser.replace(/[@#]/g, '').trim();
-      const isOwner = ['seekmao', 'seek', 'ghost', 'ghostmao'].includes(cleanUser.toLowerCase());
+      const isOwner = isOwnerUsername(cleanUser);
       const displayName = isOwner ? (cleanUser.toLowerCase().includes('seek') ? 'Seek' : 'Ghost') : cleanUser;
       const userRole = isOwner ? 'owner' : 'member';
 
@@ -2293,7 +2357,7 @@
         email: email,
         role: userRole,
         avatar: 'bandoplug.png',
-        bio: isOwner ? 'Fondator & Conducere Oficială BandoPlug RP.' : 'Nou membru pe forumul BandoPlug.',
+        bio: isOwner ? 'Fondator & Conducere Oficială BandoPlug RP.' : 'Membru pe comunitatea BandoPlug.',
         tag: '@' + cleanUser.toLowerCase(),
         joinedDate: 'Astăzi'
       };
@@ -2307,7 +2371,7 @@
       if (!discordUser || !discordUser.trim()) return;
 
       const cleanUser = discordUser.trim().replace(/[@#]/g, '');
-      const isOwner = ['seekmao', 'seek', 'ghost', 'ghostmao'].includes(cleanUser.toLowerCase());
+      const isOwner = isOwnerUsername(cleanUser);
       const displayName = isOwner ? (cleanUser.toLowerCase().includes('seek') ? 'Seek' : 'Ghost') : cleanUser;
 
       const sessionUser = {
@@ -2343,6 +2407,6 @@
   </script>
 
   <!-- External App Script -->
-  <script src="app.js?v=8.0"></script>
+  <script src="app.js?v=9.0"></script>
 </body>
 </html>
