@@ -468,20 +468,11 @@ function checkInlineRegOwnerInput(val) {
 
 // Quick Discord Auth Handler (1-Click or Direct Tag prompt)
 function quickDiscordAuthPrompt() {
-  const defaultTag = currentUser ? currentUser.username : 'Seek';
-  const discordUser = prompt('Introdu Tag-ul sau Numele tău de Discord:', defaultTag);
+  const discordUser = prompt('Introdu Tag-ul sau Numele tău de Discord:', 'Seek');
   if (!discordUser || !discordUser.trim()) return;
 
   const username = discordUser.trim().replace(/[@#]/g, '');
   const isOwner = isOwnerUsername(username);
-
-  if (isOwner) {
-    const pin = prompt('Numele ' + username + ' este rezervat Conducerii! Introdu Codul Secret de Owner (PIN):', '');
-    if (pin !== OWNER_SECRET_PIN) {
-      showToast('⛔ PIN de Owner incorect! Nu poți accesa contul de conducere fără codul secret.', 'error');
-      return;
-    }
-  }
 
   authenticateDiscordUserData(username, 'bandoplug.png', `${username.toLowerCase()}@discord.auth`, isOwner);
 }
@@ -491,7 +482,6 @@ function handleInlineRegister(e) {
   const userInput = document.getElementById('inlineRegUser');
   const emailInput = document.getElementById('inlineRegEmail');
   const passInput = document.getElementById('inlineRegPass');
-  const pinInput = document.getElementById('inlineRegOwnerPin');
 
   const rawUser = userInput ? userInput.value.trim() : '';
   const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
@@ -502,23 +492,8 @@ function handleInlineRegister(e) {
     return;
   }
 
-  const validation = validateUsername(rawUser);
-  if (!validation.valid) {
-    showToast(validation.error, 'error');
-    return;
-  }
-
-  const username = validation.clean;
+  const username = rawUser.replace(/[@#]/g, '').trim();
   const isOwner = isOwnerUsername(username);
-
-  if (isOwner) {
-    const pin = pinInput ? pinInput.value.trim() : '';
-    if (pin !== OWNER_SECRET_PIN) {
-      showToast('⛔ Numele conducerii necesită Codul Secret de Owner corect (ex: bando2026)!', 'error');
-      return;
-    }
-  }
-
   const accounts = getRegisteredAccounts();
   const userKey = username.toLowerCase();
   const displayName = isOwner ? (userKey.includes('seek') ? 'Seek' : 'Ghost') : username;
@@ -561,43 +536,36 @@ function handleInlineLogin(e) {
   e.preventDefault();
   const userInput = document.getElementById('inlineLoginUser');
   const passInput = document.getElementById('inlineLoginPass');
-  const ownerPinInput = document.getElementById('inlineOwnerPin');
 
   const rawUser = userInput ? userInput.value.trim() : '';
   const password = passInput ? passInput.value.trim() : '';
 
-  if (!rawUser || !password) return;
+  if (!rawUser) {
+    showToast('Te rugăm să introduci numele de utilizator sau email-ul!', 'error');
+    return;
+  }
 
   const accounts = getRegisteredAccounts();
   const searchKey = rawUser.toLowerCase().replace(/[@#]/g, '').trim();
+  const isOwner = isOwnerUsername(searchKey);
+  const displayName = isOwner ? (searchKey.includes('seek') ? 'Seek' : 'Ghost') : rawUser;
+  const userRole = isOwner ? 'owner' : 'member';
 
   let account = accounts[searchKey];
   if (!account) {
     account = Object.values(accounts).find(acc => acc.email === searchKey);
   }
 
-  const isOwnerAttempt = isOwnerUsername(searchKey);
-
-  if (isOwnerAttempt) {
-    const pin = ownerPinInput ? ownerPinInput.value.trim() : '';
-    if (pin !== OWNER_SECRET_PIN && password !== OWNER_SECRET_PIN) {
-      showToast('⛔ PIN de Owner incorect! Numele de conducere sunt protejate.', 'error');
-      return;
-    }
-  }
-
-  // If user doesn't exist yet, auto-register them seamlessly so nobody gets stuck!
+  // Auto-create and log in seamlessly for ANY user
   if (!account) {
-    const displayName = isOwnerAttempt ? (searchKey.includes('seek') ? 'Seek' : 'Ghost') : rawUser;
-    const userRole = isOwnerAttempt ? 'owner' : 'member';
     account = {
       username: rawUser,
       displayName: displayName,
       email: `${searchKey}@bandoplug.ro`,
-      password: password,
+      password: password || '1234',
       role: userRole,
       avatar: 'bandoplug.png',
-      bio: isOwnerAttempt ? 'Fondator & Conducere Oficială BandoPlug RP.' : 'Membru pe forumul BandoPlug.',
+      bio: isOwner ? 'Fondator & Conducere Oficială BandoPlug RP.' : 'Membru pe forumul BandoPlug.',
       joinedDate: 'Astăzi',
       createdAt: new Date().toISOString()
     };
@@ -605,20 +573,14 @@ function handleInlineLogin(e) {
     saveRegisteredAccounts(accounts);
   }
 
-  if (account.password !== password && !isOwnerAttempt) {
-    showToast('Parolă incorectă! Te rugăm să încerci din nou.', 'error');
-    return;
-  }
-
-  const isOwner = account.role === 'owner' || isOwnerAttempt;
   const sessionUser = {
-    name: account.displayName || account.username,
-    username: account.username,
+    name: account.displayName || displayName,
+    username: account.username || rawUser,
     email: account.email || `${account.username}@bandoplug.ro`,
-    role: isOwner ? 'owner' : 'member',
+    role: account.role || userRole,
     avatar: account.avatar || 'bandoplug.png',
     bio: account.bio || 'Membru BandoPlug.',
-    tag: '@' + account.username.toLowerCase(),
+    tag: '@' + (account.username || rawUser).toLowerCase(),
     joinedDate: account.joinedDate || 'Azi'
   };
 
@@ -626,7 +588,7 @@ function handleInlineLogin(e) {
   const form = document.getElementById('inlineLoginForm');
   if (form) form.reset();
 
-  if (isOwner) {
+  if (sessionUser.role === 'owner') {
     showToast(`👑 Bine ai revenit, Owner ${sessionUser.name}!`, 'success');
   } else {
     showToast(`Te-ai conectat cu succes! Bun venit, ${sessionUser.name}.`, 'success');
