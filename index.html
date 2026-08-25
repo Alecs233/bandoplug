@@ -126,85 +126,11 @@
     </div>
   </header>
 
-  <!-- HERO SECTION -->
-  <section class="hero-section" id="heroSection">
-    <div class="hero-bg-overlay"></div>
-    <div class="hero-glow-blob"></div>
-    <div class="container hero-container">
-      <div class="hero-content">
-        <div class="hero-badge">
-          <i class="fa-solid fa-fire text-red"></i> COMUNITATE EXCLUSIVISTĂ FIVEM ROLEPLAY
-        </div>
-        <h1 class="hero-heading">BANDO<span>PLUG</span> ROMÂNIA</h1>
-        <p class="hero-desc">
-          Bun venit pe portalul oficial al comunității <strong>BandoPlug</strong>. Experimentează cel mai avansat sistem de Roleplay urban, gang-uri personalizate, economie dinamică, departamente de elită și o comunitate unită.
-        </p>
-
-        <div class="hero-cta-group">
-          <a href="fivem://connect/play.bandoplug.ro" class="btn btn-hero-primary">
-            <i class="fa-solid fa-play"></i> Conectează-te pe Server
-          </a>
-          <a href="https://discord.gg/8cR9EA48US" target="_blank" class="btn btn-hero-discord">
-            <i class="fa-brands fa-discord"></i> Alătură-te pe Discord
-          </a>
-          <button class="btn btn-hero-outline" onclick="switchView('regulament')">
-            <i class="fa-solid fa-shield-halved"></i> Citește Regulamentul
-          </button>
-        </div>
-
-        <!-- Quick Stats Cards -->
-        <div class="hero-stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
-            <div class="stat-info">
-              <h3 id="statPlayers">184 / 250</h3>
-              <p>Jucători Conectați</p>
-            </div>
-            <span class="status-indicator online"></span>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon"><i class="fa-brands fa-discord"></i></div>
-            <div class="stat-info">
-              <h3 id="statDiscord">3,420+</h3>
-              <p>Membri Discord</p>
-            </div>
-            <span class="status-indicator online"></span>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon"><i class="fa-solid fa-comments"></i></div>
-            <div class="stat-info">
-              <h3 id="statTopics">1,280</h3>
-              <p>Discuții pe Forum</p>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon"><i class="fa-solid fa-gauge-high"></i></div>
-            <div class="stat-info">
-              <h3>128 Hz</h3>
-              <p>Tickrate & 0 Lag</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero-visual">
-        <div class="logo-showcase-card">
-          <div class="logo-glow-ring"></div>
-          <img src="bandoplug.png" onerror="this.onerror=null; this.src='assets/bandoplug.png';" alt="BandoPlug Official" class="hero-logo-img">
-          <div class="logo-tag">BANDO PLUG RP</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- MAIN APP CONTAINER (Views) -->
-  <main class="container main-content-wrapper">
+  <main class="container main-content-wrapper" style="padding-top: 20px;">
 
     <!-- GUEST VIEW: EXACT WINDY CITY STYLE LOGIN (Visible when not logged in) -->
-    <div id="view-guest-login" class="app-view">
+    <div id="view-guest-login" class="app-view active-view">
       <div class="xf-guest-container">
         
         <!-- Center Logo -->
@@ -301,8 +227,33 @@
       </div>
     </div>
 
-    <!-- VIEW 1: HOME & FORUMS (Visible when logged in) -->
-    <div id="view-forum" class="app-view active-view">
+    <!-- VIEW 1: HOME & FORUMS (Visible when logged in - Screenshot 2 Replica) -->
+    <div id="view-forum" class="app-view">
+
+      <!-- Center Logo & Season Banner for Logged in user -->
+      <div class="xf-center-logo-wrap" style="margin-bottom: 20px;">
+        <img src="bandoplug.png" onerror="this.onerror=null; this.src='assets/bandoplug.png';" alt="BandoPlug RP" class="xf-center-logo-img">
+      </div>
+
+      <div class="xf-season-box" style="margin-bottom: 20px;">
+        <h3>BandoPlug Season 1</h3>
+        <p>Season 1 Is Here! Comunitate Exclusivistă FiveM Roleplay</p>
+      </div>
+
+      <!-- Forum Title Strip with Post Thread Button (Screenshot 2) -->
+      <div style="background: #14161d; border: 1px solid #232733; border-radius: 6px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 style="font-family: var(--font-heading); font-size: 18px; font-weight: 700; color: #fff; margin: 0;">
+          <i class="fa-solid fa-comments text-red"></i> BandoPlug Roleplay
+        </h2>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-secondary" style="padding: 8px 14px; font-size: 13px;" onclick="filterTopics()">
+            <i class="fa-solid fa-newspaper"></i> New posts
+          </button>
+          <button class="btn btn-green" style="padding: 8px 16px; font-size: 13px; font-weight: 700;" onclick="openNewPostModal()">
+            <i class="fa-solid fa-plus"></i> Post thread...
+          </button>
+        </div>
+      </div>
       
       <!-- XenForo Red Guest Alert Banner (Visible when unauthenticated user tries to click) -->
       <div class="xf-guest-alert-banner" id="globalGuestBanner" style="display: none;">
