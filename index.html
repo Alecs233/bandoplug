@@ -1547,7 +1547,45 @@
     </div>
   </footer>
 
-  <!-- Scripts -->
-  <script src="app.js?v=3.0"></script>
+  <!-- Embedded Fail-Safe Guest Script Handlers -->
+  <script>
+    function switchGuestTab(tab) {
+      const loginForm = document.getElementById('inlineLoginForm');
+      const regForm = document.getElementById('inlineRegisterForm');
+      const loginBtn = document.getElementById('tabGuestLoginBtn');
+      const regBtn = document.getElementById('tabGuestRegisterBtn');
+
+      if (tab === 'login') {
+        if (loginForm) loginForm.style.display = 'block';
+        if (regForm) regForm.style.display = 'none';
+        if (loginBtn) {
+          loginBtn.style.borderBottom = '2px solid #ff1e38';
+          loginBtn.style.color = '#fff';
+          loginBtn.style.background = 'transparent';
+        }
+        if (regBtn) {
+          regBtn.style.borderBottom = '2px solid transparent';
+          regBtn.style.color = '#8b949e';
+          regBtn.style.background = 'rgba(0,0,0,0.2)';
+        }
+      } else {
+        if (loginForm) loginForm.style.display = 'none';
+        if (regForm) regForm.style.display = 'block';
+        if (regBtn) {
+          regBtn.style.borderBottom = '2px solid #ff1e38';
+          regBtn.style.color = '#fff';
+          regBtn.style.background = 'transparent';
+        }
+        if (loginBtn) {
+          loginBtn.style.borderBottom = '2px solid transparent';
+          loginBtn.style.color = '#8b949e';
+          loginBtn.style.background = 'rgba(0,0,0,0.2)';
+        }
+      }
+    }
+  </script>
+
+  <!-- External App Script -->
+  <script src="app.js?v=4.0"></script>
 </body>
 </html>
